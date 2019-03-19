@@ -20,23 +20,43 @@ Here is an example use of it:
 
  ```graphql
 mutation CreateCustomer(
-  $firstname: String!, 
-  $password: String!, 
-  $lastname: String!, 
-  $email: String!,
-  $addresses: [CustomerAddressInput!]
+    $firstname: String!
+    $password: String!
+    $lastname: String!
+    $email: String!
+    $addresses: [CreateCustomerAddressInput!]
 ) {
-  createCustomer(
-    customer: {
-    	firstname: $firstname,
-      lastname: $lastname,
-      email: $email,
-      addresses: $addresses
-    }, 
-    password: $password
-  ) {
-    id
-  }
+    createCustomer(
+        customer: {
+            firstname: $firstname
+            lastname: $lastname
+            email: $email
+            addresses: $addresses
+        }
+        password: $password
+    ) {
+        status
+        token
+        customer {
+            id
+            firstname
+            lastname
+            email
+            is_subscribed
+            addresses {
+                city
+                country_id
+                street
+                telephone
+                firstname
+                lastname
+                postcode
+                street
+                default_shipping
+                default_billing
+            }
+        }
+    }
 }
 ```
 
@@ -44,15 +64,20 @@ The variables for input above might look like:
 
 ```json
 {
-  "firstname": "Alfred",
-  "lastname": "Genkin",
-  "email": "alfreds@gmail.com",
-  "addresses": [
-    {
-    	"firstname": "Alfreds",
-    	"lastname": "Genkins"
-  	}
-  ],
-  "password": "option123"
+    "firstname": "Alfred",
+    "lastname": "Genkin",
+    "email": "alfreds+valid12@gmail.com",
+    "password": "Testing123_",
+    "addresses": [
+        {
+            "firstname": "Alfreds",
+            "lastname": "Genkins",
+            "telephone": "22522240",
+            "country_id": "LV",
+            "city": "Riga",      
+            "street": [ "Bitera 15" ],
+            "postcode": "LV-1067"
+        }
+    ]
 }
 ```
