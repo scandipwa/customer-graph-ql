@@ -217,12 +217,10 @@ class CreateCustomer implements ResolverInterface {
                 $status = self::REGISTRATION_STATUS_SUCCESS;
             }
 
-            return array_unique(
-                array_merge(
-                    $this->customerDataProvider->getCustomerById((int)$customer->getId()),
-                    [ 'status' => $status ],
-                    [ 'token' => $token ]
-                )
+            return array_merge(
+                [ 'customer' => $this->customerDataProvider->getCustomerById((int)$customer->getId()) ],
+                [ 'status' => $status ],
+                [ 'token' => $token ]
             );
         } catch (\Exception $e) {
             throw new GraphQlInputException(__($e->getMessage()), $e);
