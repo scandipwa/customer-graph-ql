@@ -46,6 +46,10 @@ class CreateCustomer implements ResolverInterface {
      */
     private $formKeyValidator;
 
+    private $customerFactory;
+
+    private $storeManager;
+
     /**
      * @param Session $customerSession
      * @param Registration $registration
@@ -56,10 +60,16 @@ class CreateCustomer implements ResolverInterface {
     public function __construct(
         Session $customerSession,
         Registration $registration,
+        CustomerFactory $customerFactory,
+        StoreManagerInterface $storeManager,
+        AddressFactory $addressFactory,
         Validator $formKeyValidator = null
     ) {
+        $this->storeManager = $storeManager;
+        $this->customerFactory = $customerFactory;
         $this->session = $customerSession;
         $this->registration = $registration;
+        $this->addressFactory = $addressFactory;
         $this->formKeyValidator = $formKeyValidator ?: ObjectManager::getInstance()->get(Validator::class);
     }
 
@@ -84,30 +94,31 @@ class CreateCustomer implements ResolverInterface {
         $this->session->regenerateId();
 
         try {
-            // $customer = $customerFactory->create();
-            // $customer->setWebsiteId($websiteId);
-            // $customer->setEmail('newemail@mail.com');
-            // $customer->setFirstname('FirstName');
-            // $customer->setLastname('LastName');
-            // $customer->setPassword('123456789');
-            // $customer->save();
+            $customerData = $args['customer'];
+            $passwordData = $args['password'];
 
-            // $address = $addresss->create();
-            // $address->setCustomerId($customer->getId())
-            //     ->setFirstname('FirstName')
-            //     ->setLastname('LastName')
-            //     ->setCountryId('VN')
-            //     ->setPostcode('10000')
-            //     ->setCity('HaNoi')
-            //     ->setTelephone('1234567890')
-            //     ->setFax('123456789')
-            //     ->setCompany('Company')
-            //     ->setStreet('Street')
-            //     ->setIsDefaultBilling('1')
-            //     ->setIsDefaultShipping('1')
-            //     ->setSaveInAddressBook('1');
 
-            // $address->save();
+
+            $websiteId = $this->storeManager->getWebsite()->getWebsiteId();
+            $customer = $this->customerFactory->create();
+            $customer
+                ->setWebsiteId($websiteId)
+                ->setEmail($customerData['email'])
+                ->setFirstname($customerData['firstname'])
+                ->setLastname($customerData['lastname'])
+                ->setPassword($passwordData)
+                ->save();
+
+            $address = $this->addressFactory->create();
+            $address
+                ->setCustomerId($customer->getId())
+                ->setData($customerData['addresses'])
+                ->setIsDefaultBilling('1')
+                ->setIsDefaultShipping('1')
+                ->setSaveInAddressBook('1')
+                ->save();
+
+            return $customer->getData();
         } catch (StateException $e) {
             throw new GraphQlInputException(__('There is already an account with this email address.'), $e);
         } catch (InputException $e) {

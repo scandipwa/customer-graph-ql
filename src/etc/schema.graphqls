@@ -27,10 +27,32 @@ type Mutation {
 }
 
 input CreateCustomerInput {
-    firstname: String
-    lastname: String
-    email: String
+    firstname: String!
+    lastname: String!
+    email: String!
     addresses: [CustomerAddressInput] @doc(description: "An array containing the customer's shipping and billing addresses")
+}
+
+input CustomerAddressInput {
+    firstname: String! @doc(description: "The first name of the person associated with the shipping/billing address")
+    lastname: String! @doc(description: "The family name of the person associated with the shipping/billing address")
+    company: String @doc(description: "The customer's company")
+    telephone: String! @doc(description: "The telephone number")
+    commercial: String @doc(description: "Is Commercial Address")
+    street: [String!] @doc(description: "An array of strings that define the street number and name")
+    city: String! @doc(description: "The city or town")
+    region: CustomerAddressRegionInput @doc(description: "An object containing the region name, region code, and region ID")
+    postcode: String! @doc(description: "The customer's ZIP or postal code")
+    country_id: CountryCodeEnum! @doc(description: "The customer's country")
+    default_shipping: Boolean @doc(description: "Indicates whether the address is the default shipping address")
+    default_billing: Boolean @doc(description: "Indicates whether the address is the default billing address")
+    fax: String @doc(description: "The fax number")
+    middlename: String @doc(description: "The middle name of the person associated with the shipping/billing address")
+    prefix: String @doc(description: "An honorific, such as Dr., Mr., or Mrs.")
+    suffix: String @doc(description: "A value such as Sr., Jr., or III")
+    vat_id: String @doc(description: "The customer's Tax/VAT number (for corporate customers)")
+    region_id: Int @doc(description: "Region ID")
+    custom_attributes: [CustomerAddressAttributeInput] @doc(description: "Address custom attributes")
 }
 
 input CustomerAddressInput {
