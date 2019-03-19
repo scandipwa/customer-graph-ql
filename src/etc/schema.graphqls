@@ -16,7 +16,7 @@ type Query {
 }
 
 type Mutation {
-    createCustomer(customer: CreateCustomerInput!, password: String!): Customer @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\CreateCustomer") @doc(description:"Create customer account")
+    createCustomer(customer: CreateCustomerInput!, password: String!): CreateCustomerType @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\CreateCustomer") @doc(description:"Create customer account")
     generateCustomerToken(email: String!, password: String!): CustomerToken @resolver(class: "\\Magento\\CustomerGraphQl\\Model\\Resolver\\GenerateCustomerToken") @doc(description:"Retrieve the customer token")
     changeCustomerPassword(currentPassword: String!, newPassword: String!): Customer @resolver(class: "\\Magento\\CustomerGraphQl\\Model\\Resolver\\ChangePassword") @doc(description:"Changes the password for the logged-in customer")
     updateCustomer (input: UpdateCustomerInput!): UpdateCustomerOutput @resolver(class: "\\Magento\\CustomerGraphQl\\Model\\Resolver\\UpdateCustomer") @doc(description:"Update the customer's personal information")
@@ -26,14 +26,21 @@ type Mutation {
     deleteCustomerAddress(id: Int!): Boolean @resolver(class: "Magento\\CustomerGraphQl\\Model\\Resolver\\DeleteCustomerAddress") @doc(description: "Delete customer address")
 }
 
+type CreateCustomerType {
+    status: String,
+    token: String,
+    customer: Customer
+}
+
 input CreateCustomerInput {
     firstname: String!
     lastname: String!
     email: String!
-    addresses: [CustomerAddressInput] @doc(description: "An array containing the customer's shipping and billing addresses")
+    is_subscribed: Boolean
+    addresses: [CreateCustomerAddressInput!] @doc(description: "An array containing the customer's shipping and billing addresses")
 }
 
-input CustomerAddressInput {
+input CreateCustomerAddressInput {
     firstname: String! @doc(description: "The first name of the person associated with the shipping/billing address")
     lastname: String! @doc(description: "The family name of the person associated with the shipping/billing address")
     company: String @doc(description: "The customer's company")
