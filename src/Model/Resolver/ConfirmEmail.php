@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ScandiPWA\CustomerGraphQl\Model\Resolver;
 
+use Magento\Framework\Exception\StateException;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 use Magento\Framework\GraphQl\Query\Resolver\ContextInterface;
@@ -26,7 +27,7 @@ use Magento\CustomerGraphQl\Model\Customer\CustomerDataProvider;
 use Magento\Integration\Api\CustomerTokenServiceInterface;
 
 class ConfirmEmail implements ResolverInterface {
-    const CONFIRMATION_STATUS_SUCCESS = 'success';
+    const CONFIRMATION_STATUS_TOKEN_EXPIRED = 'token_expired';
 
     /**
      * @var Session
@@ -87,7 +88,7 @@ class ConfirmEmail implements ResolverInterface {
     )
     {
         if ($this->session->isLoggedIn()) {
-            throw new GraphQlInputException(__('This user is already logged in!'));
+            return [ 'status' => AccountManagementInterface::ACCOUNT_CONFIRMATION_NOT_REQUIRED ];
         }
 
         try {
@@ -102,9 +103,11 @@ class ConfirmEmail implements ResolverInterface {
 
             return [
                 'customer' => $this->customerDataProvider->getCustomerById((int)$customer->getId()),
-                'status' => self::CONFIRMATION_STATUS_SUCCESS,
+                'status' => AccountManagementInterface::ACCOUNT_CONFIRMED,
                 'token' => $token
             ];
+        } catch (StateException $e) {
+            return [ 'status' => self::CONFIRMATION_STATUS_TOKEN_EXPIRED ];
         } catch (\Exception $e) {
             throw new GraphQlInputException(__('There was an error confirming the account'), $e);
         }

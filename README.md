@@ -133,3 +133,29 @@ The variables for input above might look like:
     "password": "Testing123_"
 }
 ```
+
+### Mutation `resendConfirmationEmail`
+
+> ⚠️ This is not tested but implemented !!! ⚠️
+
+Here is an example use of it:
+
+```graphql
+mutation ResendConfirmationEmail(
+    $email: String!
+) {
+    resendConfirmationEmail(
+        email: $email
+    ) {
+        status
+    }
+}
+```
+
+The variables for input above might look like:
+
+```json
+{
+    "email": "alfreds+valid12@gmail.com"
+}
+```

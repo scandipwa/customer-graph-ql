@@ -32,8 +32,8 @@ use Magento\Customer\Api\GroupManagementInterface;
 use Magento\CustomerGraphQl\Model\Customer\CustomerDataProvider;
 
 class CreateCustomer implements ResolverInterface {
-    const REGISTRATION_STATUS_SUCCESS = 'success';
-    const REGISTRATION_STATUS_PENDING_CONFIRMATION = 'pending_confirmation';
+    const REGISTRATION_STATUS_SUCCESS = 'account_registered';
+    const CONFIRMATION_STATUS_IS_LOGGED_IN = 'is_already_logged_in';
 
     /**
      * @var \Magento\Customer\Model\Registration
@@ -174,7 +174,7 @@ class CreateCustomer implements ResolverInterface {
         array $args = null
     ) {
         if ($this->session->isLoggedIn() || !$this->registration->isAllowed()) {
-            throw new GraphQlInputException(__('Customer is already logged in.'));
+            return [ 'status' => self::CONFIRMATION_STATUS_IS_LOGGED_IN ];
         }
 
         /**
@@ -191,7 +191,11 @@ class CreateCustomer implements ResolverInterface {
             $password = $args['password'];
 
             $customer = $this->extractCustomer($customerData);
-//            $customer->setAddresses($customerData['addresses']);
+            $validation = $this->accountManagement->validate($customer);
+
+            if (!$validation->isValid()) {
+                throw new GraphQlInputException(__('Customer fields are invalid', $validation->getMessages()));
+            }
 
             $customer = $this->accountManagement
                 ->createAccount($customer, $password);
@@ -208,7 +212,7 @@ class CreateCustomer implements ResolverInterface {
 
             $confirmationStatus = $this->accountManagement->getConfirmationStatus($customer->getId());
             if ($confirmationStatus === AccountManagementInterface::ACCOUNT_CONFIRMATION_REQUIRED) {
-                $status = self::REGISTRATION_STATUS_PENDING_CONFIRMATION;
+                $status = AccountManagementInterface::ACCOUNT_CONFIRMATION_REQUIRED;
                 /**
                  * We need to send email or what ???
                  */

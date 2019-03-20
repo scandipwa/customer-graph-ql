@@ -13,13 +13,51 @@ declare(strict_types=1);
 
 namespace ScandiPWA\CustomerGraphQl\Model\Resolver;
 
+use Magento\Customer\Api\AccountManagementInterface;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Query\Resolver\ContextInterface;
 use Magento\Framework\GraphQl\Query\Resolver\Value;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
+use Magento\Customer\Model\Session;
+use Magento\Framework\Exception\State\InvalidTransitionException;
+use Magento\Store\Model\StoreManagerInterface;
 
 class ResendConfirmationEmail implements ResolverInterface {
+    const RESEND_CONFIRMATION_STATUS_IS_LOGGED_IN = 'is_already_logged_in';
+    const RESEND_CONFIRMATION_STATUS_WRONG_EMAIL = 'wrong_email';
+    const RESEND_CONFIRMATION_STATUS_CONFIRMATION_SENT = 'confirmation_sent';
+
+    /**
+     * @var Session
+     */
+    protected $session;
+
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
+     * @var \Magento\Customer\Api\AccountManagementInterface
+     */
+    protected $customerAccountManagement;
+
+    /**
+     * ResendConfirmationEmail constructor.
+     * @param Session $customerSession
+     * @param StoreManagerInterface $storeManager
+     * @param AccountManagementInterface $customerAccountManagement
+     */
+    public function __construct(
+        Session $customerSession,
+        StoreManagerInterface $storeManager,
+        AccountManagementInterface $customerAccountManagement
+    ) {
+        $this->session = $customerSession;
+        $this->storeManager = $storeManager;
+        $this->customerAccountManagement = $customerAccountManagement;
+    }
 
     /**
      * @inheritdoc
@@ -31,6 +69,22 @@ class ResendConfirmationEmail implements ResolverInterface {
         array $value = null,
         array $args = null
     ) {
+        if ($this->session->isLoggedIn()) {
+            return [ 'status' => self::RESEND_CONFIRMATION_STATUS_IS_LOGGED_IN ];
+        }
 
+        try {
+            $email = $args['email'];
+            $this->customerAccountManagement->resendConfirmation(
+                $email,
+                $this->storeManager->getStore()->getWebsiteId()
+            );
+            $this->session->setUsername($email);
+            return [ 'status' => self::RESEND_CONFIRMATION_STATUS_CONFIRMATION_SENT ];
+        } catch (InvalidTransitionException $e) {
+            return [ 'status' => AccountManagementInterface::ACCOUNT_CONFIRMATION_NOT_REQUIRED ];
+        } catch (\Exception $e) {
+            return [ 'status' => self::RESEND_CONFIRMATION_STATUS_WRONG_EMAIL ];
+        }
     }
 }
