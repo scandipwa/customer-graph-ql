@@ -66,17 +66,17 @@ The variables for input above might look like:
 {
     "firstname": "Alfred",
     "lastname": "Genkin",
-    "email": "alfreds+valid12@gmail.com",
+    "email": "alfreds@coolmail.com",
     "password": "Testing123_",
     "addresses": [
         {
             "firstname": "Alfreds",
             "lastname": "Genkins",
             "telephone": "22522240",
-            "country_id": "LV",
-            "city": "Riga",      
-            "street": [ "Bitera 15" ],
-            "postcode": "LV-1067"
+            "country_id": "US",
+            "city": "My awesome city",      
+            "street": [ "My cool street 11" ],
+            "postcode": "My awesome US postal code"
         }
     ]
 }
