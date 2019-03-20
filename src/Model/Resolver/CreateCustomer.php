@@ -48,12 +48,12 @@ class CreateCustomer implements ResolverInterface {
     /**
      * @var Validator
      */
-    private $formKeyValidator;
+    protected $formKeyValidator;
 
     /**
      * @var AccountManagementInterface
      */
-    private $accountManagement;
+    protected $accountManagement;
 
     /**
      * @var CustomerInterfaceFactory
@@ -83,17 +83,17 @@ class CreateCustomer implements ResolverInterface {
     /**
      * @var CustomerTokenServiceInterface
      */
-    private $customerTokenService;
+    protected $customerTokenService;
 
     /**
      * @var CustomerRepositoryInterface
      */
-    private $customerRepository;
+    protected $customerRepository;
 
     /**
      * @var CustomerDataProvider
      */
-    private $customerDataProvider;
+    protected $customerDataProvider;
 
     /**
      * CreateCustomer constructor.
@@ -107,6 +107,7 @@ class CreateCustomer implements ResolverInterface {
      * @param GroupManagementInterface $customerGroupManagement
      * @param CustomerTokenServiceInterface $customerTokenService
      * @param CustomerRepositoryInterface $customerRepository
+     * @param CustomerDataProvider $customerDataProvider
      * @param Validator|null $formKeyValidator
      */
     public function __construct(

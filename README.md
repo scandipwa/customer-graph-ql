@@ -81,3 +81,55 @@ The variables for input above might look like:
     ]
 }
 ```
+
+### Mutation `confirmCustomerEmail`
+
+> ⚠️ This is not tested but implemented !!! ⚠️
+
+Here is an example use of it:
+
+```graphql
+mutation ConfirmCustomerEmail(
+    $password: String!
+    $key: String!
+    $id: String!
+) {
+    confirmCustomerEmail(
+        password: $password
+        key: $key
+        id: $id
+    ) {
+        status
+        token
+        customer {
+            id
+            firstname
+            lastname
+            email
+            is_subscribed
+            addresses {
+                city
+                country_id
+                street
+                telephone
+                firstname
+                lastname
+                postcode
+                street
+                default_shipping
+                default_billing
+            }
+        }
+    }
+}
+```
+
+The variables for input above might look like:
+
+```json
+{
+    "key": "0129309912",
+    "id": "0000000000",
+    "password": "Testing123_"
+}
+```
