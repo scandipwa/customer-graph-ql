@@ -16,8 +16,6 @@ namespace ScandiPWA\CustomerGraphQl\Model\Resolver;
 use Magento\Framework\Exception\StateException;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
-use Magento\Framework\GraphQl\Query\Resolver\ContextInterface;
-use Magento\Framework\GraphQl\Query\Resolver\Value;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\Customer\Model\Session;
@@ -27,7 +25,7 @@ use Magento\CustomerGraphQl\Model\Customer\CustomerDataProvider;
 use Magento\Integration\Api\CustomerTokenServiceInterface;
 
 class ConfirmEmail implements ResolverInterface {
-    const CONFIRMATION_STATUS_TOKEN_EXPIRED = 'token_expired';
+    const STATUS_TOKEN_EXPIRED = 'token_expired';
 
     /**
      * @var Session
@@ -107,7 +105,7 @@ class ConfirmEmail implements ResolverInterface {
                 'token' => $token
             ];
         } catch (StateException $e) {
-            return [ 'status' => self::CONFIRMATION_STATUS_TOKEN_EXPIRED ];
+            return [ 'status' => self::STATUS_TOKEN_EXPIRED ];
         } catch (\Exception $e) {
             throw new GraphQlInputException(__('There was an error confirming the account'), $e);
         }

@@ -32,8 +32,8 @@ use Magento\Customer\Api\GroupManagementInterface;
 use Magento\CustomerGraphQl\Model\Customer\CustomerDataProvider;
 
 class CreateCustomer implements ResolverInterface {
-    const REGISTRATION_STATUS_SUCCESS = 'account_registered';
-    const CONFIRMATION_STATUS_IS_LOGGED_IN = 'is_already_logged_in';
+    const STATUS_REGISTRATION_SUCCESS = 'account_registered';
+    const STATUS_IS_LOGGED_IN = 'is_already_logged_in';
 
     /**
      * @var \Magento\Customer\Model\Registration
@@ -174,7 +174,7 @@ class CreateCustomer implements ResolverInterface {
         array $args = null
     ) {
         if ($this->session->isLoggedIn() || !$this->registration->isAllowed()) {
-            return [ 'status' => self::CONFIRMATION_STATUS_IS_LOGGED_IN ];
+            return [ 'status' => self::STATUS_IS_LOGGED_IN ];
         }
 
         /**
@@ -219,7 +219,7 @@ class CreateCustomer implements ResolverInterface {
             } else {
                 $this->session->setCustomerDataAsLoggedIn($customer);
                 $token = $this->customerTokenService->createCustomerAccessToken($customer->getEmail(), $password);
-                $status = self::REGISTRATION_STATUS_SUCCESS;
+                $status = self::STATUS_REGISTRATION_SUCCESS;
             }
 
             return array_merge(

@@ -15,8 +15,6 @@ namespace ScandiPWA\CustomerGraphQl\Model\Resolver;
 
 use Magento\Customer\Api\AccountManagementInterface;
 use Magento\Framework\GraphQl\Config\Element\Field;
-use Magento\Framework\GraphQl\Query\Resolver\ContextInterface;
-use Magento\Framework\GraphQl\Query\Resolver\Value;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\Customer\Model\Session;
@@ -24,9 +22,9 @@ use Magento\Framework\Exception\State\InvalidTransitionException;
 use Magento\Store\Model\StoreManagerInterface;
 
 class ResendConfirmationEmail implements ResolverInterface {
-    const RESEND_CONFIRMATION_STATUS_IS_LOGGED_IN = 'is_already_logged_in';
-    const RESEND_CONFIRMATION_STATUS_WRONG_EMAIL = 'wrong_email';
-    const RESEND_CONFIRMATION_STATUS_CONFIRMATION_SENT = 'confirmation_sent';
+    const STATUS_IS_LOGGED_IN = 'is_already_logged_in';
+    const STATUS_WRONG_EMAIL = 'wrong_email';
+    const STATUS_CONFIRMATION_SENT = 'confirmation_sent';
 
     /**
      * @var Session
@@ -70,7 +68,7 @@ class ResendConfirmationEmail implements ResolverInterface {
         array $args = null
     ) {
         if ($this->session->isLoggedIn()) {
-            return [ 'status' => self::RESEND_CONFIRMATION_STATUS_IS_LOGGED_IN ];
+            return [ 'status' => self::STATUS_IS_LOGGED_IN ];
         }
 
         try {
@@ -80,11 +78,11 @@ class ResendConfirmationEmail implements ResolverInterface {
                 $this->storeManager->getStore()->getWebsiteId()
             );
             $this->session->setUsername($email);
-            return [ 'status' => self::RESEND_CONFIRMATION_STATUS_CONFIRMATION_SENT ];
+            return [ 'status' => self::STATUS_CONFIRMATION_SENT ];
         } catch (InvalidTransitionException $e) {
             return [ 'status' => AccountManagementInterface::ACCOUNT_CONFIRMATION_NOT_REQUIRED ];
         } catch (\Exception $e) {
-            return [ 'status' => self::RESEND_CONFIRMATION_STATUS_WRONG_EMAIL ];
+            return [ 'status' => self::STATUS_WRONG_EMAIL ];
         }
     }
 }

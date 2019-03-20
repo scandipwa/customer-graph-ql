@@ -18,7 +18,9 @@ type Query {
 type Mutation {
     createCustomer(customer: CreateCustomerInput!, password: String!): CreateCustomerType @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\CreateCustomer") @doc(description:"Create customer account")
     confirmCustomerEmail(key: String!, id: String!, password: String!): CreateCustomerType @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\ConfirmEmail") @doc(description:"Confirm customer account")
-    resendConfirmationEmail(email: String!): ResendEmailConfirmationType @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\ResendConfirmationEmail") @doc(description:"Resend customer confirmation")
+    resendConfirmationEmail(email: String!): CustomerActionConfirmationType @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\ResendConfirmationEmail") @doc(description:"Resend customer confirmation")
+    forgotPassword(email: String!): CustomerActionConfirmationType @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\ForgotPassword") @doc(description:"Resend customer confirmation")
+    resetPassword(password: String!, token: String!, password_confirmation: String!): ResetPasswordType @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\ResetPassword") @doc(description:"Resend customer confirmation")
     generateCustomerToken(email: String!, password: String!): CustomerToken @resolver(class: "\\Magento\\CustomerGraphQl\\Model\\Resolver\\GenerateCustomerToken") @doc(description:"Retrieve the customer token")
     changeCustomerPassword(currentPassword: String!, newPassword: String!): Customer @resolver(class: "\\Magento\\CustomerGraphQl\\Model\\Resolver\\ChangePassword") @doc(description:"Changes the password for the logged-in customer")
     updateCustomer (input: UpdateCustomerInput!): UpdateCustomerOutput @resolver(class: "\\Magento\\CustomerGraphQl\\Model\\Resolver\\UpdateCustomer") @doc(description:"Update the customer's personal information")
@@ -28,8 +30,13 @@ type Mutation {
     deleteCustomerAddress(id: Int!): Boolean @resolver(class: "Magento\\CustomerGraphQl\\Model\\Resolver\\DeleteCustomerAddress") @doc(description: "Delete customer address")
 }
 
-type ResendEmailConfirmationType {
+type CustomerActionConfirmationType {
     status: String @doc(description: "Customer email verification status")
+}
+
+type ResetPasswordType {
+    status: String @doc(description: "Customer reset status")
+    token: String @doc(description: "The customer token")
 }
 
 type CreateCustomerType {
