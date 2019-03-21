@@ -3,8 +3,6 @@
 **CustomerGraphQl** provides type and resolver information for the GraphQl module
 to generate customer information endpoints. 
 
-> ⚠️ This is work in progress, use on your own caution ⚠️
-
 This module implements the M2 dev customer endpoints and provides new.
 New endpoints will be documented in future releases.
 
