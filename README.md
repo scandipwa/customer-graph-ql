@@ -82,6 +82,50 @@ The variables for input above might look like:
 }
 ```
 
+### Mutation `forgotPassword`
+
+```graphql
+mutation ForgotPassword($email: String!) {
+  	forgotPassword(email: $email) {
+  		status
+	}
+}
+```
+
+The variables for input above might look like:
+
+```json
+{
+    "email": "alfreds+valid12@gmail.com"
+}
+```
+
+### Mutation `resetPassword`
+
+```graphql
+mutation ResetPassword(
+  $token: String!,
+  $password: String!,
+  $password_confirmation: String!
+) {
+  resetPassword(
+    token: $token,
+  	password: $password,
+  	password_confirmation: $password_confirmation
+  ) {
+    status
+  }
+}
+```
+
+```json
+{
+  "token": "7nk0Ch7D5SZsPHWKycAyGdonAM9MnHRw",
+  "password": "MyNewPassword123_",
+	"password_confirmation": "MyNewPassword123_"
+}
+```
+
 ### Mutation `confirmCustomerEmail`
 
 > ⚠️ This is not tested but implemented !!! ⚠️
