@@ -3,10 +3,7 @@
   "description": "N/A",
   "type": "magento2-module",
   "require": {
-      "magento/product-community-edition": "2.3.0"
-  },
-  "suggest": {
-    "magento/module-graph-ql": "*"
+      "magento/product-community-edition": "2.3.1"
   },
   "license": [
     "OSL-3.0",
@@ -17,7 +14,6 @@
       "src/registration.php"
     ],
     "psr-4": {
-      "Magento\\CustomerGraphQl\\": "overwrite",
       "ScandiPWA\\CustomerGraphQl\\": "src"
     }
   }
