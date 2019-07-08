@@ -29,7 +29,6 @@ use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 use Magento\Customer\Api\Data\CustomerInterfaceFactory;
 use Magento\Customer\Api\GroupManagementInterface;
-use Magento\CustomerGraphQl\Model\Customer\CustomerDataProvider;
 
 class CreateCustomer implements ResolverInterface {
     const STATUS_REGISTRATION_SUCCESS = 'account_registered';
@@ -107,7 +106,6 @@ class CreateCustomer implements ResolverInterface {
      * @param GroupManagementInterface $customerGroupManagement
      * @param CustomerTokenServiceInterface $customerTokenService
      * @param CustomerRepositoryInterface $customerRepository
-     * @param CustomerDataProvider $customerDataProvider
      * @param Validator|null $formKeyValidator
      */
     public function __construct(
@@ -121,7 +119,6 @@ class CreateCustomer implements ResolverInterface {
         GroupManagementInterface $customerGroupManagement,
         CustomerTokenServiceInterface $customerTokenService,
         CustomerRepositoryInterface $customerRepository,
-        CustomerDataProvider $customerDataProvider,
         Validator $formKeyValidator = null
     ) {
         $this->customerTokenService = $customerTokenService;
@@ -133,7 +130,6 @@ class CreateCustomer implements ResolverInterface {
         $this->registration = $registration;
         $this->subscriberFactory = $subscriberFactory;
         $this->storeManager = $storeManager;
-        $this->customerDataProvider = $customerDataProvider;
         $this->customerGroupManagement = $customerGroupManagement;
         $this->formKeyValidator = $formKeyValidator ?: ObjectManager::getInstance()->get(Validator::class);
     }
@@ -223,7 +219,7 @@ class CreateCustomer implements ResolverInterface {
             }
 
             return array_merge(
-                [ 'customer' => $this->customerDataProvider->getCustomerById((int)$customer->getId()) ],
+                [ 'customer' => $this->customerRepository->getById((int)$customer->getId()) ],
                 [ 'status' => $status ],
                 [ 'token' => $token ]
             );
