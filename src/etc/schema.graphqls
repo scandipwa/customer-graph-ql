@@ -16,7 +16,6 @@ type Mutation {
     resendConfirmationEmail(email: String!): CustomerActionConfirmationType @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\ResendConfirmationEmail") @doc(description:"Resend customer confirmation")
     forgotPassword(email: String!): CustomerActionConfirmationType @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\ForgotPassword") @doc(description:"Resend customer confirmation")
     resetPassword(password: String!, token: String!, password_confirmation: String!): ResetPasswordType @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\ResetPassword") @doc(description:"Resend customer confirmation")
-    checkIsEmailAvailable(email: String!, websiteId: Int): AvailabilityResponseType @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\CheckIsEmailAvailable") @doc(description:"Check if custmer email is available")
 }
 
 type CustomerActionConfirmationType {
