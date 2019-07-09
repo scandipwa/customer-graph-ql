@@ -32,7 +32,3 @@ type CreateCustomerType {
     token: String @doc(description: "The customer token")
     customer: Customer
 }
-
-type AvailabilityResponseType {
-    isAvailable: Boolean
-}
