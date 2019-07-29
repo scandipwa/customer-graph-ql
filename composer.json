@@ -3,7 +3,7 @@
   "description": "N/A",
   "type": "magento2-module",
   "require": {
-      "magento/product-community-edition": "~2.3.2"
+      "magento/magento2-base": "~2.3.2"
   },
   "license": [
     "OSL-3.0",
