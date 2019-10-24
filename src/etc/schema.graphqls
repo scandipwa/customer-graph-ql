@@ -12,6 +12,7 @@
 # See COPYING.txt for license details.
 
 type Mutation {
+    generateCustomerToken(email: String!, password: String!, guest_quote_token: String!): CustomerToken @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\GenerateCustomerToken") @doc(description:"Retrieve the customer token")
     confirmCustomerEmail(key: String!, id: String!, password: String!): CreateCustomerType @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\ConfirmEmail") @doc(description:"Confirm customer account")
     resendConfirmationEmail(email: String!): CustomerActionConfirmationType @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\ResendConfirmationEmail") @doc(description:"Resend customer confirmation")
     forgotPassword(email: String!): CustomerActionConfirmationType @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\ForgotPassword") @doc(description:"Resend customer confirmation")
