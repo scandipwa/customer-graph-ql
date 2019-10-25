@@ -58,23 +58,23 @@ class GenerateCustomerToken implements ResolverInterface
         array $value = null,
         array $args = null
     ) {
-        if (!isset($args['email']) || empty($args['email'])) {
+        if (empty($args['email'])) {
             throw new GraphQlInputException(__('Specify the "email" value.'));
         }
 
-        if (!isset($args['password']) || empty($args['password'])) {
+        if (empty($args['password'])) {
             throw new GraphQlInputException(__('Specify the "password" value.'));
         }
 
-        if (!isset($args['guest_quote_token']) || empty($args['guest_quote_token'])) {
-            throw new GraphQlInputException(__('"guest_quote_token" value is not specified.'));
+        if (empty($args['guest_quote_id'])) {
+            throw new GraphQlInputException(__('"guest_quote_id" value is not specified.'));
         }
 
         try {
             $customerToken = $this->customerTokenService->createCustomerAccessToken($args['email'], $args['password']);
 
             $this->eventManager->dispatch('generate_customer_token_after', [
-                'guest_token' => $args['guest_quote_token'],
+                'guest_quote_id' => $args['guest_quote_id'],
                 'customer_token' => $customerToken
             ]);
 
