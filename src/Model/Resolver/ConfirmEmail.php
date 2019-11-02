@@ -78,19 +78,17 @@ class ConfirmEmail implements ResolverInterface {
     )
     {
         if ($this->session->isLoggedIn()) {
-            return [ 'status' => AccountManagementInterface::ACCOUNT_CONFIRMATION_NOT_REQUIRED ];
+            $this->session->logOut();
         }
 
         try {
-            $customerId = $args['id'];
+            $customerEmail = $args['email'];
             $key = $args['key'];
             $password = $args['password'];
 
-            $customerEmail = $this->customerRepository->getById($customerId)->getEmail();
             $customer = $this->customerAccountManagement->activate($customerEmail, $key);
             $this->session->setCustomerDataAsLoggedIn($customer);
-            $token = $this->customerTokenService->createCustomerAccessToken($customer->getEmail(), $password);
-
+            $token = $this->customerTokenService->createCustomerAccessToken($customerEmail, $password);
             return [
                 'customer' => $this->customerRepository->getById((int)$customer->getId()),
                 'status' => AccountManagementInterface::ACCOUNT_CONFIRMED,
