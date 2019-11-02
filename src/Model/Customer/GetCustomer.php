@@ -88,12 +88,6 @@ class GetCustomer extends \Magento\CustomerGraphQl\Model\Customer\GetCustomer
             throw new GraphQlAuthenticationException(__('The account is locked.'));
         }
 
-        try {
-            $confirmationStatus = $this->accountManagement->getConfirmationStatus($currentUserId);
-        } catch (LocalizedException $e) {
-            throw new GraphQlInputException(__($e->getMessage()));
-        }
-
         return $customer;
     }
 
