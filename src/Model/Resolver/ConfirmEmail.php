@@ -21,7 +21,6 @@ use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\Customer\Model\Session;
 use Magento\Customer\Api\AccountManagementInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
-use Magento\CustomerGraphQl\Model\Customer\CustomerDataProvider;
 use Magento\Integration\Api\CustomerTokenServiceInterface;
 
 class ConfirmEmail implements ResolverInterface {
@@ -43,11 +42,6 @@ class ConfirmEmail implements ResolverInterface {
     protected $customerRepository;
 
     /**
-     * @var CustomerDataProvider
-     */
-    protected $customerDataProvider;
-
-    /**
      * @var CustomerTokenServiceInterface
      */
     protected $customerTokenService;
@@ -64,12 +58,10 @@ class ConfirmEmail implements ResolverInterface {
         Session $customerSession,
         AccountManagementInterface $customerAccountManagement,
         CustomerRepositoryInterface $customerRepository,
-        CustomerTokenServiceInterface $customerTokenService,
-        CustomerDataProvider $customerDataProvider
+        CustomerTokenServiceInterface $customerTokenService
     ) {
         $this->customerTokenService = $customerTokenService;
         $this->session = $customerSession;
-        $this->customerDataProvider = $customerDataProvider;
         $this->customerAccountManagement = $customerAccountManagement;
         $this->customerRepository = $customerRepository;
     }
@@ -100,7 +92,7 @@ class ConfirmEmail implements ResolverInterface {
             $token = $this->customerTokenService->createCustomerAccessToken($customer->getEmail(), $password);
 
             return [
-                'customer' => $this->customerDataProvider->getCustomerById((int)$customer->getId()),
+                'customer' => $this->customerRepository->getById((int)$customer->getId()),
                 'status' => AccountManagementInterface::ACCOUNT_CONFIRMED,
                 'token' => $token
             ];
