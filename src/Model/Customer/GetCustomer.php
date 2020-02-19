@@ -69,7 +69,7 @@ class GetCustomer extends \Magento\CustomerGraphQl\Model\Customer\GetCustomer
         $currentUserId = $context->getUserId();
         $currentUserType = $context->getUserType();
 
-        if (true === $this->isUserGuest($currentUserId, $currentUserType)) {
+        if ($this->isUserGuest($currentUserId, $currentUserType) === true) {
             throw new GraphQlAuthorizationException(__('The current customer isn\'t authorized.'));
         }
 
