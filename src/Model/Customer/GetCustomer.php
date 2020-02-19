@@ -34,17 +34,17 @@ class GetCustomer extends \Magento\CustomerGraphQl\Model\Customer\GetCustomer
     /**
      * @var AuthenticationInterface
      */
-    protected $authentication;
+    private $authentication;
 
     /**
      * @var CustomerRepositoryInterface
      */
-    protected $customerRepository;
+    private $customerRepository;
 
     /**
      * @var AccountManagementInterface
      */
-    protected $accountManagement;
+    private $accountManagement;
 
     /**
      * @param AuthenticationInterface $authentication
