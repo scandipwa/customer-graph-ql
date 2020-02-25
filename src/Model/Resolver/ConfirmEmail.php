@@ -87,7 +87,7 @@ class ConfirmEmail implements ResolverInterface {
         $this->customerTokenService = $customerTokenService;
         $this->session = $customerSession;
         $this->customerAccountManagement = $customerAccountManagement;
-        $this->customerRepository = $customerface;
+        $this->customerRepository = $customerRepository;
         $this->encryptor = $encryptor;
         $this->customerRegistry = $customerRegistry;
     }
