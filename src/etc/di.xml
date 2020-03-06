@@ -12,4 +12,9 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Magento\CustomerGraphQl\Model\Resolver\GenerateCustomerToken"
                 type="ScandiPWA\CustomerGraphQl\Model\Resolver\GenerateCustomerToken"/>
+	<type name="Magento\Catalog\Helper\Data">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">ScandiPWA\CustomerGraphQl\Model\Session</argument>
+        </arguments>
+    </type>
 </config>
