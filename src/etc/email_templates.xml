@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * ScandiPWA - Progressive Web App for Magento
+ *
+ * Copyright © Scandiweb, Inc. All rights reserved.
+ * See LICENSE for license details.
+ *
+ * @license OSL-3.0 (Open Software License ("OSL") v. 3.0)
+ * @package scandipwa/module-customer-graph-ql
+ * @link https://github.com/scandipwa/module-customer-graph-ql
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
+    <template id="customer_create_account_email_confirmation_template" label="New Account Confirmation Key" file="account_new_confirmation.html" type="html" module="ScandiPWA_CustomerGraphQl" area="frontend"/>
+    <template id="customer_create_account_email_confirmed_template" label="New Account Confirmed" file="account_new_confirmed.html" type="html" module="ScandiPWA_CustomerGraphQl" area="frontend"/>
+</config>
