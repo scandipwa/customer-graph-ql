@@ -75,10 +75,6 @@ class ExtractCustomerData extends \Magento\CustomerGraphQl\Model\Customer\Extrac
             $customer->getWebsiteId()
         );
 
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $logger = $objectManager->create('\Psr\Log\LoggerInterface');
-        $logger->info("HERE:");
-
         $customerData['confirmation_required'] = $isConfirmationRequired;
         $customerData['group_id'] = $customer->getGroupId();
 
