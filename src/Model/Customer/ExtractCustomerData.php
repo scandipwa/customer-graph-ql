@@ -72,7 +72,7 @@ class ExtractCustomerData extends \Magento\CustomerGraphQl\Model\Customer\Extrac
         $isConfirmationRequired =  $this->scopeConfig->isSetFlag(
             AccountConfirmation::XML_PATH_IS_CONFIRM,
             ScopeInterface::SCOPE_WEBSITES,
-            $customer->getStoreId()
+            $customer->getWebsiteId()
         );
 
         $customerData['confirmation_required'] = $isConfirmationRequired;
