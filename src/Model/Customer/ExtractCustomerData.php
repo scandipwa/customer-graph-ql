@@ -76,6 +76,7 @@ class ExtractCustomerData extends \Magento\CustomerGraphQl\Model\Customer\Extrac
         );
 
         $customerData['confirmation_required'] = $isConfirmationRequired;
+        $customerData['group_id'] = $customer->getGroupId();
 
         return $customerData;
     }
