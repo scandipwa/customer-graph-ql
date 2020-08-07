@@ -15,7 +15,9 @@ namespace ScandiPWA\CustomerGraphQl\Plugin;
 
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Model\AccountManagement;
+use Magento\Customer\Model\AuthenticationInterface;
 use Magento\Customer\Model\ForgotPasswordToken\GetCustomerByToken;
+use Magento\Framework\App\ObjectManager;
 use Magento\Integration\Model\Oauth\Token\RequestThrottler;
 
 class AccountManagementPlugin {
@@ -52,6 +54,13 @@ class AccountManagementPlugin {
         $this->customerRepository = $customerRepository;
         $this->requestThrottler = $requestThrottler;
     }
+    private function getAuthentication()
+    {
+        return ObjectManager::getInstance()->get(
+            AuthenticationInterface::class
+        );
+    }
+
 
     public function aroundResetPassword(
         AccountManagement $accountManagement,
@@ -71,6 +80,9 @@ class AccountManagementPlugin {
 
         // reset auth failures count to allow user log in with new password
         $this->requestThrottler->resetAuthenticationFailuresCount($customer->getEmail(), RequestThrottler::USER_TYPE_CUSTOMER);
+
+        // reset account lock in db
+        $this->getAuthentication()->unlock($customer->getId());
 
         return $result;
     }
