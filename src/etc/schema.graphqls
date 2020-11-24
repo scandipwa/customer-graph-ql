@@ -19,6 +19,10 @@ type Mutation {
     resetPassword(password: String!, token: String!, password_confirmation: String!): ResetPasswordType @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\ResetPassword") @doc(description:"Resend customer confirmation")
 }
 
+type Query {
+    customerConfig: CustomerConfig @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\CustomerConfigResolver") @doc(description: "Returns customer related configuration options")
+}
+
 type CustomerActionConfirmationType {
     status: String @doc(description: "Customer email verification status")
 }
@@ -40,4 +44,9 @@ type AvailabilityResponseType {
 
 type Customer @doc(description: "Customer defines the customer name and address and other details") {
     confirmation_required: Boolean @doc(description: "Email confirmation is required")
+}
+
+type CustomerConfig {
+    show_vat_number_on_storefront: Boolean
+    show_tax_vat_number: String
 }
