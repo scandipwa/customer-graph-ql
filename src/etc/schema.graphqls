@@ -16,7 +16,7 @@ type Mutation {
     generateCustomerToken(email: String!, password: String!, guest_quote_id: String): CustomerToken @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\GenerateCustomerToken") @doc(description:"Retrieve the customer token")
     resendConfirmationEmail(email: String!): CustomerActionConfirmationType @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\ResendConfirmationEmail") @doc(description:"Resend customer confirmation")
     forgotPassword(email: String!): CustomerActionConfirmationType @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\ForgotPassword") @doc(description:"Resend customer confirmation")
-    resetPassword(password: String!, token: String!, password_confirmation: String!): ResetPasswordType @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\ResetPassword") @doc(description:"Resend customer confirmation")
+    s_resetPassword(password: String!, token: String!, password_confirmation: String!): ResetPasswordType @resolver(class: "\\ScandiPWA\\CustomerGraphQl\\Model\\Resolver\\ResetPassword") @doc(description:"Resend customer confirmation")
 }
 
 type CustomerActionConfirmationType {
