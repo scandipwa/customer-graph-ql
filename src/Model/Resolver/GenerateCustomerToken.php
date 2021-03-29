@@ -76,6 +76,7 @@ class GenerateCustomerToken implements ResolverInterface
             $guestToken = $args['guest_quote_id'];
 
             $this->eventManager->dispatch('generate_customer_token_after', [
+                'email' => $args['email'],
                 'guest_quote_id' => $guestToken,
                 'customer_token' => $customerToken
             ]);
