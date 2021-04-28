@@ -88,39 +88,44 @@ class ValidateAddress extends SourceValidateAddress
     {
         $addressData = $this->extractCustomerAddressData->execute($address);
 
-        if (isset($addressData['country_code'])) {
-            $isRegionRequired = $this->directoryData->isRegionRequired($addressData['country_code']);
+        if (!isset($addressData['country_code'])) {
+            return;
+        }
 
-            if ($isRegionRequired && is_null($addressData['region']['region_id'])) {
-                throw new GraphQlInputException(__('A region_id is required for the specified country code'));
+        $isRegionRequired = $this->directoryData->isRegionRequired($addressData['country_code']);
+
+        if ($isRegionRequired && is_null($addressData['region']['region_id'])) {
+            throw new GraphQlInputException(__('A region_id is required for the specified country code'));
+        }
+
+        $regionCollection = $this->regionCollectionFactory
+            ->create()
+            ->addCountryFilter($addressData['country_code']);
+
+        if ($isRegionRequired) {
+            if (!isset($addressData['region']['region_code'])) {
+                $regionCollection->addRegionCodeFilter($addressData['region']['region_code']);
             }
-            $regionCollection = $this->regionCollectionFactory
-                ->create()
-                ->addCountryFilter($addressData['country_code']);
 
-            if ($isRegionRequired) {
-                if (!isset($addressData['region']['region_code'])) {
-                    $regionCollection->addRegionCodeFilter($addressData['region']['region_code']);
-                }
-
-                // In case if region required, but no options we getting id 0 witch is correct
-                if ($addressData['region']['region_id'] === 0) {
-                    return;
-                }
-
-                if (empty($regionCollection->getItemById($addressData['region']['region_id']))) {
-                    throw new GraphQlInputException(
-                        __('The specified region is not a part of the selected country or region')
-                    );
-                }
-            } else {
-                if (!empty($addressData['region']['region_id']) &&
-                    empty($regionCollection->getItemById($addressData['region']['region_id']))) {
-                    throw new GraphQlInputException(
-                        __('The region_id does not match the selected country or region')
-                    );
-                }
+            // In case if region required, but no options then we getting id 0 which is correct
+            if ($addressData['region']['region_id'] === 0) {
+                return;
             }
+
+            if (empty($regionCollection->getItemById($addressData['region']['region_id']))) {
+                throw new GraphQlInputException(
+                    __('The specified region is not a part of the selected country or region')
+                );
+            }
+
+            return;
+        }
+
+        if (!empty($addressData['region']['region_id']) &&
+            empty($regionCollection->getItemById($addressData['region']['region_id']))) {
+            throw new GraphQlInputException(
+                __('The region_id does not match the selected country or region')
+            );
         }
     }
 }
