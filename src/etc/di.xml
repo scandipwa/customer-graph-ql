@@ -16,8 +16,6 @@
                 type="ScandiPWA\CustomerGraphQl\Model\Customer\GetCustomer"/>
     <preference for="Magento\CustomerGraphQl\Model\Customer\Address\ValidateAddress"
                 type="ScandiPWA\CustomerGraphQl\Model\Customer\Address\ValidateAddress"/>
-    <preference for="Magento\CustomerGraphQl\Model\Resolver\GenerateCustomerToken"
-                type="ScandiPWA\CustomerGraphQl\Model\Resolver\GenerateCustomerToken"/>
 	<type name="Magento\Catalog\Helper\Data">
         <arguments>
             <argument name="customerSession" xsi:type="object">ScandiPWA\CustomerGraphQl\Model\Session</argument>
