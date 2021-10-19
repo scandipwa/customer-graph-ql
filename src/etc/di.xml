@@ -25,4 +25,4 @@
             <argument name="customerSession" xsi:type="object">ScandiPWA\CustomerGraphQl\Model\Session</argument>
         </arguments>
     </type>
-</config>4
+</config>
