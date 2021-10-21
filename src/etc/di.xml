@@ -18,6 +18,8 @@
                 type="ScandiPWA\CustomerGraphQl\Model\Customer\Address\ValidateAddress"/>
     <preference for="Magento\CustomerGraphQl\Model\Customer\CheckCustomerPassword"
                 type="ScandiPWA\CustomerGraphQl\Model\Customer\CheckCustomerPassword"/>
+    <preference for="Magento\CustomerGraphQl\Model\Context\AddUserInfoToContext"
+                type="ScandiPWA\CustomerGraphQl\Model\Context\AddUserInfoToContext"/>
 	<type name="Magento\Catalog\Helper\Data">
         <arguments>
             <argument name="customerSession" xsi:type="object">ScandiPWA\CustomerGraphQl\Model\Session</argument>
