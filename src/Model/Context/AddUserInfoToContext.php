@@ -18,6 +18,8 @@ use Magento\Customer\Model\ResourceModel\CustomerRepository;
 use Magento\Customer\Model\Session;
 use Magento\GraphQl\Model\Query\ContextParametersInterface;
 use Magento\CustomerGraphQl\Model\Context\AddUserInfoToContext as CoreAddUserInfoToContext;
+use Magento\Integration\Api\CustomerTokenServiceInterface;
+use Magento\Integration\Model\ResourceModel\Oauth\Token\CollectionFactory as TokenCollectionFactory;
 
 /**
  * @inheritdoc
@@ -40,6 +42,16 @@ class AddUserInfoToContext extends CoreAddUserInfoToContext
     protected $customerRepository;
 
     /**
+     * @var CustomerTokenServiceInterface
+     */
+    protected $customerTokenService;
+
+    /**
+     * @var TokenCollectionFactory
+     */
+    protected $tokenModelCollectionFactory;
+
+    /**
      * @param UserContextInterface $userContext
      * @param Session $session
      * @param CustomerRepository $customerRepository
@@ -47,7 +59,9 @@ class AddUserInfoToContext extends CoreAddUserInfoToContext
     public function __construct(
         UserContextInterface $userContext,
         Session $session,
-        CustomerRepository $customerRepository
+        CustomerRepository $customerRepository,
+        CustomerTokenServiceInterface $customerTokenService,
+        TokenCollectionFactory $tokenModelCollectionFactory
     ) {
         parent::__construct(
             $userContext,
@@ -58,6 +72,8 @@ class AddUserInfoToContext extends CoreAddUserInfoToContext
         $this->userContext = $userContext;
         $this->session = $session;
         $this->customerRepository = $customerRepository;
+        $this->customerTokenService = $customerTokenService;
+        $this->tokenModelCollectionFactory = $tokenModelCollectionFactory;
     }
 
     /**
@@ -84,15 +100,18 @@ class AddUserInfoToContext extends CoreAddUserInfoToContext
         $isCustomer = $this->isCustomer($currentUserId, $currentUserType);
         $contextParameters->addExtensionAttribute('is_customer', $isCustomer);
 
-        /*
-         * TODO: implement support for sessions
-         *
-            if ($isCustomer) {
-                $customer = $this->customerRepository->getById($currentUserId);
-                $this->session->setCustomerData($customer);
-                $this->session->setCustomerGroupId($customer->getGroupId());
+        if ($isCustomer) {
+            $customer = $this->customerRepository->getById($currentUserId);
+            $this->session->setCustomerData($customer);
+            $this->session->setCustomerGroupId($customer->getGroupId());
+
+            // Added next lines to revoke token on each request if user token is still exist
+            $tokenCollection = $this->tokenModelCollectionFactory->create()->addFilterByCustomerId($currentUserId);
+
+            if ($tokenCollection->getSize() > 0) {
+                $this->customerTokenService->revokeCustomerAccessToken($currentUserId);
             }
-        */
+        }
 
         return $contextParameters;
     }
