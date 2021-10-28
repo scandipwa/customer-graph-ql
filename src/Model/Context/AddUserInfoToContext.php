@@ -105,11 +105,13 @@ class AddUserInfoToContext extends CoreAddUserInfoToContext
             $this->session->setCustomerData($customer);
             $this->session->setCustomerGroupId($customer->getGroupId());
 
-            // Added next lines to revoke token on each request if user token is still exist
+            // Added next lines to update token on each request if user token is still exist
             $tokenCollection = $this->tokenModelCollectionFactory->create()->addFilterByCustomerId($currentUserId);
 
             if ($tokenCollection->getSize() > 0) {
-                $this->customerTokenService->revokeCustomerAccessToken($currentUserId);
+                $tokenItems = $tokenCollection->getitems();
+                // get last token of current user and update its create date since magento expires it depending on it
+                end($tokenItems)->setData('created_at', date("Y-m-d h:i:s"))->save();
             }
         }
 
