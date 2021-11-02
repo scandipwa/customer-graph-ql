@@ -21,11 +21,18 @@ use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\Customer\Model\Session;
 use Magento\Customer\Api\AccountManagementInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
-use Magento\CustomerGraphQl\Model\Customer\CustomerDataProvider;
 use Magento\Integration\Api\CustomerTokenServiceInterface;
+use Magento\Framework\Encryption\EncryptorInterface as Encryptor;
+use Magento\Customer\Model\AuthenticationInterface;
+use Magento\Customer\Model\CustomerRegistry;
 
 class ConfirmEmail implements ResolverInterface {
     const STATUS_TOKEN_EXPIRED = 'token_expired';
+
+    /**
+     * @var AuthenticationInterface
+     */
+    private $authentication;
 
     /**
      * @var Session
@@ -43,35 +50,46 @@ class ConfirmEmail implements ResolverInterface {
     protected $customerRepository;
 
     /**
-     * @var CustomerDataProvider
-     */
-    protected $customerDataProvider;
-
-    /**
      * @var CustomerTokenServiceInterface
      */
     protected $customerTokenService;
 
     /**
+     * @var Encryptor
+     */
+    protected $encryptor;
+
+    /**
+     * @var CustomerRegistry
+     */
+    protected $customerRegistry;
+
+    /**
      * ConfirmEmail constructor.
+     * @param AuthenticationInterface $authentication
      * @param Session $customerSession
      * @param AccountManagementInterface $customerAccountManagement
      * @param CustomerRepositoryInterface $customerRepository
      * @param CustomerTokenServiceInterface $customerTokenService
-     * @param CustomerDataProvider $customerDataProvider
+     * @param Encryptor $encryptor
+     * @param CustomerRegistry $customerRegistry
      */
     public function __construct(
+        AuthenticationInterface $authentication,
         Session $customerSession,
         AccountManagementInterface $customerAccountManagement,
         CustomerRepositoryInterface $customerRepository,
         CustomerTokenServiceInterface $customerTokenService,
-        CustomerDataProvider $customerDataProvider
+        Encryptor $encryptor,
+        CustomerRegistry $customerRegistry
     ) {
+        $this->authentication = $authentication;
         $this->customerTokenService = $customerTokenService;
         $this->session = $customerSession;
-        $this->customerDataProvider = $customerDataProvider;
         $this->customerAccountManagement = $customerAccountManagement;
         $this->customerRepository = $customerRepository;
+        $this->encryptor = $encryptor;
+        $this->customerRegistry = $customerRegistry;
     }
 
     /**
@@ -86,26 +104,31 @@ class ConfirmEmail implements ResolverInterface {
     )
     {
         if ($this->session->isLoggedIn()) {
-            return [ 'status' => AccountManagementInterface::ACCOUNT_CONFIRMATION_NOT_REQUIRED ];
+            $this->session->logOut();
         }
 
         try {
-            $customerId = $args['id'];
+            $customerEmail = $args['email'];
             $key = $args['key'];
             $password = $args['password'];
 
-            $customerEmail = $this->customerRepository->getById($customerId)->getEmail();
-            $customer = $this->customerAccountManagement->activate($customerEmail, $key);
-            $this->session->setCustomerDataAsLoggedIn($customer);
-            $token = $this->customerTokenService->createCustomerAccessToken($customer->getEmail(), $password);
+            $id = $this->customerRepository->get($customerEmail)->getId();
+            $currentPasswordHash = $this->customerRegistry->retrieveSecureData($id)->getPasswordHash();
 
-            return [
-                'customer' => $this->customerDataProvider->getCustomerById((int)$customer->getId()),
-                'status' => AccountManagementInterface::ACCOUNT_CONFIRMED,
-                'token' => $token
-            ];
+            if ($this->encryptor->validateHash($password, $currentPasswordHash)) {
+                $customer = $this->customerAccountManagement->activate($customerEmail, $key);
+
+                $this->session->setCustomerDataAsLoggedIn($customer);
+                $token = $this->customerTokenService->createCustomerAccessToken($customerEmail, $password);
+                return [
+                    'status' => AccountManagementInterface::ACCOUNT_CONFIRMED,
+                    'token' => $token
+                ];
+            } else {
+                throw new GraphQlInputException(__('Password is incorrect'));
+            }
         } catch (StateException $e) {
-            return [ 'status' => self::STATUS_TOKEN_EXPIRED ];
+            return ['status' => self::STATUS_TOKEN_EXPIRED];
         } catch (\Exception $e) {
             throw new GraphQlInputException(__('There was an error confirming the account'), $e);
         }
