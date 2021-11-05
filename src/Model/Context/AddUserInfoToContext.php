@@ -111,7 +111,7 @@ class AddUserInfoToContext extends CoreAddUserInfoToContext
             if ($tokenCollection->getSize() > 0) {
                 $tokenItems = $tokenCollection->getitems();
                 // get last token of current user and update its create date since magento expires it depending on it
-                end($tokenItems)->setData('created_at', date("Y-m-d h:i:s"))->save();
+                end($tokenItems)->setData('created_at', date("Y-m-d H:i:s"))->save();
             }
         }
 
