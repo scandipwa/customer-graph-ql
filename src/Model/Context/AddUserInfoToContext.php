@@ -20,6 +20,7 @@ use Magento\GraphQl\Model\Query\ContextParametersInterface;
 use Magento\CustomerGraphQl\Model\Context\AddUserInfoToContext as CoreAddUserInfoToContext;
 use Magento\Integration\Api\CustomerTokenServiceInterface;
 use Magento\Integration\Model\ResourceModel\Oauth\Token\CollectionFactory as TokenCollectionFactory;
+use Magento\Framework\Stdlib\DateTime\DateTime;
 
 /**
  * @inheritdoc
@@ -52,16 +53,25 @@ class AddUserInfoToContext extends CoreAddUserInfoToContext
     protected $tokenModelCollectionFactory;
 
     /**
+     * @var DateTime
+     */
+    protected $dateTime;
+
+    /**
      * @param UserContextInterface $userContext
      * @param Session $session
      * @param CustomerRepository $customerRepository
+     * @param CustomerTokenServiceInterface $customerTokenService
+     * @param TokenCollectionFactory $tokenModelCollectionFactory
+     * @param DateTime $dateTime
      */
     public function __construct(
         UserContextInterface $userContext,
         Session $session,
         CustomerRepository $customerRepository,
         CustomerTokenServiceInterface $customerTokenService,
-        TokenCollectionFactory $tokenModelCollectionFactory
+        TokenCollectionFactory $tokenModelCollectionFactory,
+        DateTime $dateTime
     ) {
         parent::__construct(
             $userContext,
@@ -74,6 +84,7 @@ class AddUserInfoToContext extends CoreAddUserInfoToContext
         $this->customerRepository = $customerRepository;
         $this->customerTokenService = $customerTokenService;
         $this->tokenModelCollectionFactory = $tokenModelCollectionFactory;
+        $this->dateTime = $dateTime;
     }
 
     /**
@@ -111,7 +122,7 @@ class AddUserInfoToContext extends CoreAddUserInfoToContext
             if ($tokenCollection->getSize() > 0) {
                 $tokenItems = $tokenCollection->getitems();
                 // get last token of current user and update its create date since magento expires it depending on it
-                end($tokenItems)->setData('created_at', date("Y-m-d H:i:s"))->save();
+                end($tokenItems)->setCreatedAt($this->dateTime->gmtDate())->save();
             }
         }
 
