@@ -19,6 +19,7 @@
             <module name="Magento_Integration"/>
             <module name="Magento_Customer"/>
             <module name="Magento_CustomerGraphQl"/>
+            <module name="Magento_Newsletter"/>
         </sequence>
 	</module>
 </config>
