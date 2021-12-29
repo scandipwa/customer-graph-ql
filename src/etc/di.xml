@@ -22,7 +22,7 @@
                 type="ScandiPWA\CustomerGraphQl\Model\Customer\CheckCustomerPassword"/>
     <preference for="Magento\CustomerGraphQl\Model\Context\AddUserInfoToContext"
                 type="ScandiPWA\CustomerGraphQl\Model\Context\AddUserInfoToContext"/>
-	<preference for="Magento\Integration\Model\CustomerTokenService"
+    <preference for="Magento\Integration\Model\CustomerTokenService"
                 type="ScandiPWA\CustomerGraphQl\Model\CustomerTokenService"/>
     <type name="Magento\Catalog\Helper\Data">
         <arguments>
