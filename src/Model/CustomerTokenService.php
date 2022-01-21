@@ -22,6 +22,7 @@ use Magento\Integration\Model\ResourceModel\Oauth\Token\CollectionFactory as Tok
 use Magento\Integration\Model\Oauth\Token\RequestThrottler;
 use Magento\Framework\Exception\AuthenticationException;
 use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\App\ObjectManager;
 use Magento\Integration\Model\CustomerTokenService as SourceCustomerTokenService;
 
 /**
@@ -35,36 +36,36 @@ class CustomerTokenService extends SourceCustomerTokenService
      *
      * @var TokenModelFactory
      */
-    private $tokenModelFactory;
+    protected $tokenModelFactory;
 
     /**
-     * @var Magento\Framework\Event\ManagerInterface
+     * @var ManagerInterface
      */
-    private $eventManager;
+    protected $eventManager;
 
     /**
      * Customer Account Service
      *
      * @var AccountManagementInterface
      */
-    private $accountManagement;
+    protected $accountManagement;
 
     /**
-     * @var \Magento\Integration\Model\CredentialsValidator
+     * @var CredentialsValidator
      */
-    private $validatorHelper;
+    protected $validatorHelper;
 
     /**
      * Token Collection Factory
      *
      * @var TokenCollectionFactory
      */
-    private $tokenModelCollectionFactory;
+    protected $tokenModelCollectionFactory;
 
     /**
      * @var RequestThrottler
      */
-    private $requestThrottler;
+    protected $requestThrottler;
 
     /**
      * Initialize service
@@ -72,8 +73,8 @@ class CustomerTokenService extends SourceCustomerTokenService
      * @param TokenModelFactory $tokenModelFactory
      * @param AccountManagementInterface $accountManagement
      * @param TokenCollectionFactory $tokenModelCollectionFactory
-     * @param \Magento\Integration\Model\CredentialsValidator $validatorHelper
-     * @param \Magento\Framework\Event\ManagerInterface $eventManager
+     * @param CredentialsValidator $validatorHelper
+     * @param ManagerInterface $eventManager
      */
     public function __construct(
         TokenModelFactory $tokenModelFactory,
@@ -87,27 +88,29 @@ class CustomerTokenService extends SourceCustomerTokenService
             $accountManagement,
             $tokenModelCollectionFactory,
             $validatorHelper,
-            $eventManager ?: \Magento\Framework\App\ObjectManager::getInstance()
+            $eventManager ?: ObjectManager::getInstance()
                 ->get(ManagerInterface::class)
         );
 
         $this->tokenModelFactory = $tokenModelFactory;
         $this->accountManagement = $accountManagement;
         $this->validatorHelper = $validatorHelper;
-        $this->eventManager = $eventManager ?: \Magento\Framework\App\ObjectManager::getInstance()
+        $this->eventManager = $eventManager ?: ObjectManager::getInstance()
             ->get(ManagerInterface::class);
     }
 
     /**
      * Create customer access token
+     * Adding separate message for EmailNotConfirmedException
      * @param $username
      * @param $password
      * @return string
      */
-    public function createCustomerAccessToken($username, $password)
+    public function createCustomerAccessToken($username, $password): string
     {
         $this->validatorHelper->validate($username, $password);
         $this->getRequestThrottler()->throttle($username, RequestThrottler::USER_TYPE_CUSTOMER);
+
         try {
             $customerDataObject = $this->accountManagement->authenticate($username, $password);
         } catch (EmailNotConfirmedException $e) {
@@ -123,8 +126,10 @@ class CustomerTokenService extends SourceCustomerTokenService
                 )
             );
         }
+
         $this->eventManager->dispatch('customer_login', ['customer' => $customerDataObject]);
         $this->getRequestThrottler()->resetAuthenticationFailuresCount($username, RequestThrottler::USER_TYPE_CUSTOMER);
+
         return $this->tokenModelFactory->create()->createCustomerToken($customerDataObject->getId())->getToken();
     }
 
@@ -134,11 +139,12 @@ class CustomerTokenService extends SourceCustomerTokenService
      * @return RequestThrottler
      * @deprecated 100.0.4
      */
-    private function getRequestThrottler()
+    protected function getRequestThrottler(): RequestThrottler
     {
         if (!$this->requestThrottler instanceof RequestThrottler) {
-            return \Magento\Framework\App\ObjectManager::getInstance()->get(RequestThrottler::class);
+            return ObjectManager::getInstance()->get(RequestThrottler::class);
         }
+
         return $this->requestThrottler;
     }
 }
