@@ -23,6 +23,7 @@ use Magento\Integration\Model\Oauth\Token\RequestThrottler;
 use Magento\Framework\Exception\AuthenticationException;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\App\ObjectManager;
+use Magento\Framework\UrlInterface;
 use Magento\Integration\Model\CustomerTokenService as SourceCustomerTokenService;
 
 /**
@@ -68,6 +69,11 @@ class CustomerTokenService extends SourceCustomerTokenService
     protected $requestThrottler;
 
     /**
+     * @var UrlInterface
+     */
+    protected $urlBuilder;
+
+    /**
      * Initialize service
      *
      * @param TokenModelFactory $tokenModelFactory
@@ -75,13 +81,15 @@ class CustomerTokenService extends SourceCustomerTokenService
      * @param TokenCollectionFactory $tokenModelCollectionFactory
      * @param CredentialsValidator $validatorHelper
      * @param ManagerInterface $eventManager
+     * @param UrlInterface $urlBuilder
      */
     public function __construct(
         TokenModelFactory $tokenModelFactory,
         AccountManagementInterface $accountManagement,
         TokenCollectionFactory $tokenModelCollectionFactory,
         CredentialsValidator $validatorHelper,
-        ManagerInterface $eventManager = null
+        ManagerInterface $eventManager = null,
+        UrlInterface $urlBuilder
     ) {
         parent::__construct(
             $tokenModelFactory,
@@ -97,6 +105,7 @@ class CustomerTokenService extends SourceCustomerTokenService
         $this->validatorHelper = $validatorHelper;
         $this->eventManager = $eventManager ?: ObjectManager::getInstance()
             ->get(ManagerInterface::class);
+        $this->urlBuilder = $urlBuilder;
     }
 
     /**
@@ -106,7 +115,7 @@ class CustomerTokenService extends SourceCustomerTokenService
      * @param $password
      * @return string
      */
-    public function createCustomerAccessToken($username, $password): string
+    public function createCustomerAccessToken($username, $password, $storeId = null): string
     {
         $this->validatorHelper->validate($username, $password);
         $this->getRequestThrottler()->throttle($username, RequestThrottler::USER_TYPE_CUSTOMER);
@@ -114,8 +123,13 @@ class CustomerTokenService extends SourceCustomerTokenService
         try {
             $customerDataObject = $this->accountManagement->authenticate($username, $password);
         } catch (EmailNotConfirmedException $e) {
+            $href = $this->urlBuilder->getUrl(
+                'customer/account/confirmation',
+                ['_query' => ['store' => $storeId, 'email' => $username]]
+            );
+
             throw new EmailNotConfirmedException(
-                __('You must confirm your account before signing in. Please check your email.')
+                __('This account is not confirmed. <a href="%1">Click here</a> to resend confirmation email.', $href)
             );
         } catch (\Exception $e) {
             $this->getRequestThrottler()->logAuthenticationFailure($username, RequestThrottler::USER_TYPE_CUSTOMER);

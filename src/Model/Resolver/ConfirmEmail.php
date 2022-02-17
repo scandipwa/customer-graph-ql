@@ -25,6 +25,7 @@ use Magento\Integration\Api\CustomerTokenServiceInterface;
 use Magento\Framework\Encryption\EncryptorInterface as Encryptor;
 use Magento\Customer\Model\AuthenticationInterface;
 use Magento\Customer\Model\CustomerRegistry;
+use Magento\Store\Model\StoreManagerInterface;
 
 class ConfirmEmail implements ResolverInterface {
     const STATUS_TOKEN_EXPIRED = 'token_expired';
@@ -65,6 +66,11 @@ class ConfirmEmail implements ResolverInterface {
     protected $customerRegistry;
 
     /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
      * ConfirmEmail constructor.
      * @param AuthenticationInterface $authentication
      * @param Session $customerSession
@@ -73,6 +79,7 @@ class ConfirmEmail implements ResolverInterface {
      * @param CustomerTokenServiceInterface $customerTokenService
      * @param Encryptor $encryptor
      * @param CustomerRegistry $customerRegistry
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         AuthenticationInterface $authentication,
@@ -81,7 +88,8 @@ class ConfirmEmail implements ResolverInterface {
         CustomerRepositoryInterface $customerRepository,
         CustomerTokenServiceInterface $customerTokenService,
         Encryptor $encryptor,
-        CustomerRegistry $customerRegistry
+        CustomerRegistry $customerRegistry,
+        StoreManagerInterface $storeManager
     ) {
         $this->authentication = $authentication;
         $this->customerTokenService = $customerTokenService;
@@ -90,6 +98,7 @@ class ConfirmEmail implements ResolverInterface {
         $this->customerRepository = $customerRepository;
         $this->encryptor = $encryptor;
         $this->customerRegistry = $customerRegistry;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -117,9 +126,10 @@ class ConfirmEmail implements ResolverInterface {
 
             if ($this->encryptor->validateHash($password, $currentPasswordHash)) {
                 $customer = $this->customerAccountManagement->activate($customerEmail, $key);
+                $storeId = $this->storeManager->getStore()->getId();
 
                 $this->session->setCustomerDataAsLoggedIn($customer);
-                $token = $this->customerTokenService->createCustomerAccessToken($customerEmail, $password);
+                $token = $this->customerTokenService->createCustomerAccessToken($customerEmail, $password, $storeId);
                 return [
                     'status' => AccountManagementInterface::ACCOUNT_CONFIRMED,
                     'token' => $token
