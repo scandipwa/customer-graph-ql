@@ -71,7 +71,7 @@ class CustomerTokenService extends SourceCustomerTokenService
     /**
      * @var UrlInterface
      */
-    protected $urlBuilder;
+    protected UrlInterface $urlBuilder;
 
     /**
      * Initialize service
@@ -113,6 +113,7 @@ class CustomerTokenService extends SourceCustomerTokenService
      * Adding separate message for EmailNotConfirmedException
      * @param $username
      * @param $password
+     * @param $storeId
      * @return string
      */
     public function createCustomerAccessToken($username, $password, $storeId = null): string

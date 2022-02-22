@@ -68,7 +68,7 @@ class ConfirmEmail implements ResolverInterface {
     /**
      * @var StoreManagerInterface
      */
-    protected $storeManager;
+    protected StoreManagerInterface $storeManager;
 
     /**
      * ConfirmEmail constructor.
