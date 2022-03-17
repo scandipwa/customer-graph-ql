@@ -1,5 +1,14 @@
 <?php
-
+/**
+ * ScandiPWA - Progressive Web App for Magento
+ *
+ * Copyright © Scandiweb, Inc. All rights reserved.
+ * See LICENSE for license details.
+ *
+ * @license OSL-3.0 (Open Software License ("OSL") v. 3.0)
+ * @package scandipwa/module-customer-graph-ql
+ * @link https://github.com/scandipwa/module-customer-graph-ql
+ */
 namespace ScandiPWA\CustomerGraphQl\Model\Customer;
 
 use Magento\Customer\Api\Data\CustomerInterface;
