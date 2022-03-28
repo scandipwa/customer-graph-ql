@@ -16,9 +16,11 @@ namespace ScandiPWA\CustomerGraphQl\Model\Context;
 use Magento\Authorization\Model\UserContextInterface;
 use Magento\Customer\Model\ResourceModel\CustomerRepository;
 use Magento\Customer\Model\Session;
+use Magento\Framework\Webapi\Request;
 use Magento\GraphQl\Model\Query\ContextParametersInterface;
 use Magento\CustomerGraphQl\Model\Context\AddUserInfoToContext as CoreAddUserInfoToContext;
 use Magento\Integration\Api\CustomerTokenServiceInterface;
+use Magento\Integration\Model\Oauth\TokenFactory;
 use Magento\Integration\Model\ResourceModel\Oauth\Token\CollectionFactory as TokenCollectionFactory;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 
@@ -27,6 +29,9 @@ use Magento\Framework\Stdlib\DateTime\DateTime;
  */
 class AddUserInfoToContext extends CoreAddUserInfoToContext
 {
+    const AUTH_HEADER = 'Authorization';
+    const AUTH_HEADER_TYPE = 'bearer';
+
     /**
      * @var UserContextInterface
      */
@@ -58,12 +63,24 @@ class AddUserInfoToContext extends CoreAddUserInfoToContext
     protected $dateTime;
 
     /**
+     * @var Request
+     */
+    protected $request;
+
+    /**
+     * @var TokenFactory
+     */
+    protected $tokenFactory;
+
+    /**
      * @param UserContextInterface $userContext
      * @param Session $session
      * @param CustomerRepository $customerRepository
      * @param CustomerTokenServiceInterface $customerTokenService
      * @param TokenCollectionFactory $tokenModelCollectionFactory
      * @param DateTime $dateTime
+     * @param Request $request
+     * @param TokenFactory $tokenFactory
      */
     public function __construct(
         UserContextInterface $userContext,
@@ -71,7 +88,9 @@ class AddUserInfoToContext extends CoreAddUserInfoToContext
         CustomerRepository $customerRepository,
         CustomerTokenServiceInterface $customerTokenService,
         TokenCollectionFactory $tokenModelCollectionFactory,
-        DateTime $dateTime
+        DateTime $dateTime,
+        Request $request,
+        TokenFactory $tokenFactory
     ) {
         parent::__construct(
             $userContext,
@@ -85,6 +104,8 @@ class AddUserInfoToContext extends CoreAddUserInfoToContext
         $this->customerTokenService = $customerTokenService;
         $this->tokenModelCollectionFactory = $tokenModelCollectionFactory;
         $this->dateTime = $dateTime;
+        $this->request = $request;
+        $this->tokenFactory = $tokenFactory;
     }
 
     /**
@@ -92,7 +113,7 @@ class AddUserInfoToContext extends CoreAddUserInfoToContext
      */
     public function execute(ContextParametersInterface $contextParameters): ContextParametersInterface
     {
-        $currentUserId = $this->userContext->getUserId();
+        $currentUserId = $this->getCurrentUserId();
 
         if ($currentUserId !== null) {
             $currentUserId = (int)$currentUserId;
@@ -127,6 +148,38 @@ class AddUserInfoToContext extends CoreAddUserInfoToContext
         }
 
         return $contextParameters;
+    }
+
+    /**
+     * Returns authorized customer id; if valid token passed in header.
+     *
+     * @return int|null
+     */
+    protected function getCurrentUserId()
+    {
+        $authorizationHeaderValue = $this->request->getHeader(self::AUTH_HEADER);
+        if (!$authorizationHeaderValue) {
+            return 0;
+        }
+
+        $headerPieces = explode(' ', $authorizationHeaderValue);
+        if (count($headerPieces) !== 2) {
+            return 0;
+        }
+
+        $tokenType = strtolower($headerPieces[0]);
+        if ($tokenType !== self::AUTH_HEADER_TYPE) {
+            return 0;
+        }
+
+        $bearerToken = $headerPieces[1];
+        $token = $this->tokenFactory->create()->loadByToken($bearerToken);
+
+        if (!$token->getId() || $token->getRevoked()) {
+            return 0;
+        }
+
+        return $this->userContext->getUserId();
     }
 
     /**
