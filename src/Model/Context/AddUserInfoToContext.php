@@ -35,42 +35,42 @@ class AddUserInfoToContext extends CoreAddUserInfoToContext
     /**
      * @var UserContextInterface
      */
-    protected $userContext;
+    protected UserContextInterface $userContext;
 
     /**
      * @var Session
      */
-    protected $session;
+    protected Session $session;
 
     /**
      * @var CustomerRepository
      */
-    protected $customerRepository;
+    protected CustomerRepository $customerRepository;
 
     /**
      * @var CustomerTokenServiceInterface
      */
-    protected $customerTokenService;
+    protected CustomerTokenServiceInterface $customerTokenService;
 
     /**
      * @var TokenCollectionFactory
      */
-    protected $tokenModelCollectionFactory;
+    protected TokenCollectionFactory $tokenModelCollectionFactory;
 
     /**
      * @var DateTime
      */
-    protected $dateTime;
+    protected DateTime $dateTime;
 
     /**
      * @var Request
      */
-    protected $request;
+    protected Request $request;
 
     /**
      * @var TokenFactory
      */
-    protected $tokenFactory;
+    protected TokenFactory $tokenFactory;
 
     /**
      * @param UserContextInterface $userContext
@@ -114,11 +114,6 @@ class AddUserInfoToContext extends CoreAddUserInfoToContext
     public function execute(ContextParametersInterface $contextParameters): ContextParametersInterface
     {
         $currentUserId = $this->getCurrentUserId();
-
-        if ($currentUserId !== null) {
-            $currentUserId = (int)$currentUserId;
-        }
-
         $contextParameters->setUserId($currentUserId);
 
         $currentUserType = $this->userContext->getUserType();
@@ -153,21 +148,24 @@ class AddUserInfoToContext extends CoreAddUserInfoToContext
     /**
      * Returns authorized customer id; if valid token passed in header.
      *
-     * @return int|null
+     * @return int
      */
-    protected function getCurrentUserId()
+    public function getCurrentUserId(): int
     {
         $authorizationHeaderValue = $this->request->getHeader(self::AUTH_HEADER);
+
         if (!$authorizationHeaderValue) {
             return 0;
         }
 
         $headerPieces = explode(' ', $authorizationHeaderValue);
+
         if (count($headerPieces) !== 2) {
             return 0;
         }
 
         $tokenType = strtolower($headerPieces[0]);
+
         if ($tokenType !== self::AUTH_HEADER_TYPE) {
             return 0;
         }
@@ -179,7 +177,7 @@ class AddUserInfoToContext extends CoreAddUserInfoToContext
             return 0;
         }
 
-        return $this->userContext->getUserId();
+        return (int)$this->userContext->getUserId();
     }
 
     /**

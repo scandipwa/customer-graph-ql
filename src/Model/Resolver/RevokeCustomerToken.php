@@ -27,7 +27,7 @@ class RevokeCustomerToken extends SourceRevokeCustomerToken
     /**
      * @var Session
      */
-    protected $session;
+    protected Session $session;
 
     /**
      * @param CustomerTokenServiceInterface $customerTokenService
