@@ -25,9 +25,9 @@
     <preference for="Magento\Integration\Model\CustomerTokenService"
                 type="ScandiPWA\CustomerGraphQl\Model\CustomerTokenService"/>
     <preference for="Magento\CustomerGraphQl\Model\Customer\UpdateCustomerAccount"
-                type="ScandiPWA\CustomerGraphQl\Model\Customer\UpdateCustomerAccount"/>   
+                type="ScandiPWA\CustomerGraphQl\Model\Customer\UpdateCustomerAccount"/>
     <preference for="Magento\CustomerGraphQl\Model\Resolver\RevokeCustomerToken"
-                type="ScandiPWA\CustomerGraphQl\Model\Resolver\RevokeCustomerToken"/>         
+                type="ScandiPWA\CustomerGraphQl\Model\Resolver\RevokeCustomerToken"/>
     <type name="Magento\Catalog\Helper\Data">
         <arguments>
             <argument name="customerSession" xsi:type="object">ScandiPWA\CustomerGraphQl\Model\Session</argument>
