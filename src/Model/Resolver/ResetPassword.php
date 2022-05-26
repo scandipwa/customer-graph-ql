@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ScandiPWA\CustomerGraphQl\Model\Resolver;
 
+use Magento\Framework\Exception\InputException;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 use Magento\Framework\GraphQl\Query\ResolverInterface;

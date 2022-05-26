@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <!--
 /**
- * ScandiPWA_CustomerGraphQl
+ * ScandiPWA - Progressive Web App for Magento
  *
- * @category    Scandiweb
- * @package     ScandiPWA_CustomerGraphQl
- * @author      Kirils Scerba <info@scandiweb.com>
- * @copyright   Copyright (c) 2019 Scandiweb, Ltd (https://scandiweb.com)
+ * Copyright © Scandiweb, Inc. All rights reserved.
+ * See LICENSE for license details.
+ *
+ * @license OSL-3.0 (Open Software License ("OSL") v. 3.0)
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
@@ -14,23 +14,20 @@
                 type="ScandiPWA\CustomerGraphQl\Model\Customer\ExtractCustomerData"/>
     <preference for="Magento\CustomerGraphQl\Model\Customer\GetCustomer"
                 type="ScandiPWA\CustomerGraphQl\Model\Customer\GetCustomer"/>
-    <preference for="Magento\CustomerGraphQl\Model\Resolver\GenerateCustomerToken"
-                type="ScandiPWA\CustomerGraphQl\Model\Resolver\GenerateCustomerToken"/>
-
-    <type name="Magento\Customer\Model\AccountManagement">
-        <plugin
-            name="ScandiPWA_AccountManagement"
-            type="ScandiPWA\CustomerGraphQl\Plugin\AccountManagementPlugin"
-            sortOrder="5"
-        />
-    </type>
-
-    <type name="\ScandiPWA\CustomerGraphQl\Plugin\AccountManagementPlugin">
-        <arguments>
-            <argument name="getByToken" xsi:type="object">Magento\Customer\Model\ForgotPasswordToken\GetCustomerByToken</argument>
-        </arguments>
-    </type>
-
+    <preference for="Magento\CustomerGraphQl\Model\Customer\Address\ValidateAddress"
+                type="ScandiPWA\CustomerGraphQl\Model\Customer\Address\ValidateAddress"/>
+    <preference for="Magento\CustomerGraphQl\Model\Customer\Address\UpdateCustomerAddress"
+                type="ScandiPWA\CustomerGraphQl\Model\Customer\Address\UpdateCustomerAddress"/>
+    <preference for="Magento\CustomerGraphQl\Model\Customer\CheckCustomerPassword"
+                type="ScandiPWA\CustomerGraphQl\Model\Customer\CheckCustomerPassword"/>
+    <preference for="Magento\CustomerGraphQl\Model\Context\AddUserInfoToContext"
+                type="ScandiPWA\CustomerGraphQl\Model\Context\AddUserInfoToContext"/>
+    <preference for="Magento\Integration\Model\CustomerTokenService"
+                type="ScandiPWA\CustomerGraphQl\Model\CustomerTokenService"/>
+    <preference for="Magento\CustomerGraphQl\Model\Customer\UpdateCustomerAccount"
+                type="ScandiPWA\CustomerGraphQl\Model\Customer\UpdateCustomerAccount"/>
+    <preference for="Magento\CustomerGraphQl\Model\Resolver\RevokeCustomerToken"
+                type="ScandiPWA\CustomerGraphQl\Model\Resolver\RevokeCustomerToken"/>
     <type name="Magento\Catalog\Helper\Data">
         <arguments>
             <argument name="customerSession" xsi:type="object">ScandiPWA\CustomerGraphQl\Model\Session</argument>
