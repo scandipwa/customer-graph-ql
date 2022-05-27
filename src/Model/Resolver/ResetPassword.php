@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ScandiPWA\CustomerGraphQl\Model\Resolver;
 
+use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
@@ -36,12 +37,24 @@ class ResetPassword implements ResolverInterface {
      */
     protected $session;
 
+    /**
+     * @var CustomerRepositoryInterface
+     */
+    private $customerRepository;
+
+    /**
+     * ResetPassword constructor.
+     *
+     * @param CustomerRepositoryInterface $customerRepository
+     */
     public function __construct(
         Session $customerSession,
+        CustomerRepositoryInterface $customerRepository,
         AccountManagementInterface $accountManagement
     ) {
         $this->session = $customerSession;
         $this->accountManagement = $accountManagement;
+        $this->customerRepository = $customerRepository;
     }
 
     /**
@@ -57,6 +70,9 @@ class ResetPassword implements ResolverInterface {
         $resetPasswordToken = $args['token'];
         $password = $args['password'];
         $passwordConfirmation = $args['password_confirmation'];
+        $customerId = $args['customer_id'];
+
+        $customerEmail = $this->customerRepository->getById($customerId)->getEmail();
 
         if ($password !== $passwordConfirmation) {
             return [
@@ -73,7 +89,7 @@ class ResetPassword implements ResolverInterface {
         }
 
         try {
-            $this->accountManagement->resetPassword(null, $resetPasswordToken, $password);
+            $this->accountManagement->resetPassword($customerEmail, $resetPasswordToken, $password);
             $this->session->unsRpToken();
             return [ 'status' => self::STATUS_PASSWORD_UPDATED ];
         } catch (InputException $e) {
