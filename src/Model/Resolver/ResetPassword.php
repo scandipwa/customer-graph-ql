@@ -40,7 +40,7 @@ class ResetPassword implements ResolverInterface {
     /**
      * @var CustomerRepositoryInterface
      */
-    private $customerRepository;
+    protected $customerRepository;
 
     /**
      * ResetPassword constructor.
@@ -72,7 +72,11 @@ class ResetPassword implements ResolverInterface {
         $passwordConfirmation = $args['password_confirmation'];
         $customerId = $args['customer_id'];
 
-        $customerEmail = $this->customerRepository->getById($customerId)->getEmail();
+        try {
+            $customerEmail = $this->customerRepository->getById($customerId)->getEmail();
+        } catch (\Exception $exception) {
+            throw new GraphQlInputException(__('No customer found'));
+        }
 
         if ($password !== $passwordConfirmation) {
             return [
@@ -95,7 +99,7 @@ class ResetPassword implements ResolverInterface {
         } catch (InputException $e) {
             throw new GraphQlInputException(__($e->getMessage()));
         } catch (\Exception $exception) {
-            throw new GraphQlInputException(__('Something went wrong while saving the new password.'));
+            throw new GraphQlInputException(__('Your password reset link has expired.'));
         }
     }
 }
