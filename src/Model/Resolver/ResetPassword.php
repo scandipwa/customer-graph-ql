@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ScandiPWA\CustomerGraphQl\Model\Resolver;
 
+use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\GraphQl\Config\Element\Field;
@@ -39,22 +40,32 @@ class ResetPassword implements ResolverInterface {
     protected $session;
 
     /**
+     * @var CustomerRepositoryInterface
+     */
+    protected $customerRepository;
+
+    /**
      * @var ConfirmCustomerByToken
      */
     protected ConfirmCustomerByToken $confirmByToken;
 
     /**
+     * ResetPassword constructor.
+     *
      * @param Session $customerSession
      * @param AccountManagementInterface $accountManagement
+     * @param CustomerRepositoryInterface $customerRepository
      * @param ConfirmCustomerByToken|null $confirmByToken
      */
     public function __construct(
         Session $customerSession,
+        CustomerRepositoryInterface $customerRepository,
         AccountManagementInterface $accountManagement,
         ConfirmCustomerByToken $confirmByToken = null
     ) {
         $this->session = $customerSession;
         $this->accountManagement = $accountManagement;
+        $this->customerRepository = $customerRepository;
         $this->confirmByToken = $confirmByToken
             ?? ObjectManager::getInstance()->get(ConfirmCustomerByToken::class);
     }
@@ -72,6 +83,13 @@ class ResetPassword implements ResolverInterface {
         $resetPasswordToken = $args['token'];
         $password = $args['password'];
         $passwordConfirmation = $args['password_confirmation'];
+        $customerId = $args['customer_id'];
+
+        try {
+            $customerEmail = $this->customerRepository->getById($customerId)->getEmail();
+        } catch (\Exception $exception) {
+            throw new GraphQlInputException(__('No customer found'));
+        }
 
         if ($password !== $passwordConfirmation) {
             return [
@@ -92,14 +110,14 @@ class ResetPassword implements ResolverInterface {
             // and if not do this along with changing the password
             $this->confirmByToken->execute($resetPasswordToken);
 
-            $this->accountManagement->resetPassword(null, $resetPasswordToken, $password);
+            $this->accountManagement->resetPassword($customerEmail, $resetPasswordToken, $password);
             $this->session->unsRpToken();
 
             return [ 'status' => self::STATUS_PASSWORD_UPDATED ];
         } catch (InputException $e) {
             throw new GraphQlInputException(__($e->getMessage()));
         } catch (\Exception $exception) {
-            throw new GraphQlInputException(__('Something went wrong while saving the new password.'));
+            throw new GraphQlInputException(__('Your password reset link has expired.'));
         }
     }
 }

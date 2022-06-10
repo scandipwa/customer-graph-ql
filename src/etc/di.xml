@@ -28,6 +28,8 @@
                 type="ScandiPWA\CustomerGraphQl\Model\Customer\UpdateCustomerAccount"/>
     <preference for="Magento\CustomerGraphQl\Model\Resolver\RevokeCustomerToken"
                 type="ScandiPWA\CustomerGraphQl\Model\Resolver\RevokeCustomerToken"/>
+    <preference for="Magento\CustomerGraphQl\Model\Resolver\CreateCustomer"
+                type="ScandiPWA\CustomerGraphQl\Model\Resolver\CreateCustomer"/>
     <type name="Magento\Catalog\Helper\Data">
         <arguments>
             <argument name="customerSession" xsi:type="object">ScandiPWA\CustomerGraphQl\Model\Session</argument>
