@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ScandiPWA\CustomerGraphQl\Model\Resolver;
 
 use Magento\Customer\Api\CustomerRepositoryInterface;
-use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
@@ -66,8 +65,7 @@ class ResetPassword implements ResolverInterface {
         $this->session = $customerSession;
         $this->accountManagement = $accountManagement;
         $this->customerRepository = $customerRepository;
-        $this->confirmByToken = $confirmByToken
-            ?? ObjectManager::getInstance()->get(ConfirmCustomerByToken::class);
+        $this->confirmByToken = $confirmByToken;
     }
 
     /**
