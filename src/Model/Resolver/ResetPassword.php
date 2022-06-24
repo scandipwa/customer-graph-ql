@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ScandiPWA\CustomerGraphQl\Model\Resolver;
 
 use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Customer\Model\AuthenticationInterface;
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
@@ -43,6 +45,11 @@ class ResetPassword implements ResolverInterface {
     protected $customerRepository;
 
     /**
+     * @var AuthenticationInterface
+     */
+    protected $authentication;
+
+    /**
      * ResetPassword constructor.
      *
      * @param CustomerRepositoryInterface $customerRepository
@@ -50,11 +57,13 @@ class ResetPassword implements ResolverInterface {
     public function __construct(
         Session $customerSession,
         CustomerRepositoryInterface $customerRepository,
-        AccountManagementInterface $accountManagement
+        AccountManagementInterface $accountManagement,
+        AuthenticationInterface $authenctication
     ) {
         $this->session = $customerSession;
         $this->accountManagement = $accountManagement;
         $this->customerRepository = $customerRepository;
+        $this->authentication = $authenctication;
     }
 
     /**
@@ -94,6 +103,7 @@ class ResetPassword implements ResolverInterface {
 
         try {
             $this->accountManagement->resetPassword($customerEmail, $resetPasswordToken, $password);
+            $this->authentication->unlock($customerId);
             $this->session->unsRpToken();
             return [ 'status' => self::STATUS_PASSWORD_UPDATED ];
         } catch (InputException $e) {
