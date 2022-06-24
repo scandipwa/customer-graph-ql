@@ -59,11 +59,15 @@ class ResetPassword implements ResolverInterface {
     public function __construct(
         Session $customerSession,
         CustomerRepositoryInterface $customerRepository,
-        AccountManagementInterface $accountManagement
+        AccountManagementInterface $accountManagement,
+        AuthenticationInterface $authenctication,
+        ObjectManager $objectManager
     ) {
         $this->session = $customerSession;
         $this->accountManagement = $accountManagement;
         $this->customerRepository = $customerRepository;
+        $this-> authetication = $authenctication;
+        $this-> objecManaget = $objectManager;
     }
 
     /**
