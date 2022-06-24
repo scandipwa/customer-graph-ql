@@ -44,12 +44,10 @@ class ResetPassword implements ResolverInterface {
      */
     protected $customerRepository;
 
-    protected function getAuthentication()
-    {
-        return ObjectManager::getInstance()->get(
-            AuthenticationInterface::class
-        );
-    }
+    /**
+     * @var AuthenticationInterface
+     */
+    protected $authentication;
 
     /**
      * ResetPassword constructor.
@@ -60,14 +58,12 @@ class ResetPassword implements ResolverInterface {
         Session $customerSession,
         CustomerRepositoryInterface $customerRepository,
         AccountManagementInterface $accountManagement,
-        AuthenticationInterface $authenctication,
-        ObjectManager $objectManager
+        AuthenticationInterface $authenctication
     ) {
         $this->session = $customerSession;
         $this->accountManagement = $accountManagement;
         $this->customerRepository = $customerRepository;
-        $this-> authetication = $authenctication;
-        $this-> objecManaget = $objectManager;
+        $this->authentication = $authenctication;
     }
 
     /**
@@ -107,7 +103,7 @@ class ResetPassword implements ResolverInterface {
 
         try {
             $this->accountManagement->resetPassword($customerEmail, $resetPasswordToken, $password);
-            $this->getAuthentication()->unlock($customerId);
+            $this->authentication->unlock($customerId);
             $this->session->unsRpToken();
             return [ 'status' => self::STATUS_PASSWORD_UPDATED ];
         } catch (InputException $e) {
