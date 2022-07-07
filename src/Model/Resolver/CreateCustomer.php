@@ -87,7 +87,7 @@ class CreateCustomer extends SourceCreateCustomer
     ) {
         $output = parent::resolve($field, $context, $info, $value, $args);
 
-        if (isset($args['input']['orderID']) && isset($output['customer']['id'])) {
+        if (isset($args['input']['orderID']) && !empty($args['input']['orderID']) && isset($output['customer']['id'])) {
             $orderModel = $this->orderFactory->create()->loadByIncrementId($args['input']['orderID']);
 
             $orderModel->setCustomerId($output['customer']['id']);
