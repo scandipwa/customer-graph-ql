@@ -23,6 +23,7 @@ use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\Customer\Model\Session;
 use Magento\Customer\Api\AccountManagementInterface;
+use Magento\Customer\Model\ForgotPasswordToken\ConfirmCustomerByToken;
 
 class ResetPassword implements ResolverInterface {
     const STATUS_PASSWORDS_MISS_MATCH = 'passwords_miss_match';
@@ -50,20 +51,30 @@ class ResetPassword implements ResolverInterface {
     protected $authentication;
 
     /**
+     * @var ConfirmCustomerByToken
+     */
+    protected ConfirmCustomerByToken $confirmByToken;
+
+    /**
      * ResetPassword constructor.
      *
+     * @param Session $customerSession
+     * @param AccountManagementInterface $accountManagement
      * @param CustomerRepositoryInterface $customerRepository
+     * @param ConfirmCustomerByToken|null $confirmByToken
      */
     public function __construct(
         Session $customerSession,
         CustomerRepositoryInterface $customerRepository,
         AccountManagementInterface $accountManagement,
-        AuthenticationInterface $authenctication
+        AuthenticationInterface $authenctication,
+        ConfirmCustomerByToken $confirmByToken = null
     ) {
         $this->session = $customerSession;
         $this->accountManagement = $accountManagement;
         $this->customerRepository = $customerRepository;
         $this->authentication = $authenctication;
+        $this->confirmByToken = $confirmByToken;
     }
 
     /**
@@ -102,9 +113,14 @@ class ResetPassword implements ResolverInterface {
         }
 
         try {
+            // Check if the user has not yet confirmed the account
+            // and if not do this along with changing the password
+            $this->confirmByToken->execute($resetPasswordToken);
+
             $this->accountManagement->resetPassword($customerEmail, $resetPasswordToken, $password);
             $this->authentication->unlock($customerId);
             $this->session->unsRpToken();
+
             return [ 'status' => self::STATUS_PASSWORD_UPDATED ];
         } catch (InputException $e) {
             throw new GraphQlInputException(__($e->getMessage()));
