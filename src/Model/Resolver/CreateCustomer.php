@@ -89,11 +89,14 @@ class CreateCustomer extends SourceCreateCustomer
 
         if (isset($args['input']['orderID']) && !empty($args['input']['orderID']) && isset($output['customer']['id'])) {
             $orderModel = $this->orderFactory->create()->loadByIncrementId($args['input']['orderID']);
+            $orderCustomerEmail = $orderModel->getCustomerEmail();
 
-            $orderModel->setCustomerId($output['customer']['id']);
-            $orderModel->setCustomerIsGuest(0);
+            if ($args['input']['email'] === $orderCustomerEmail) {
+                $orderModel->setCustomerId($output['customer']['id']);
+                $orderModel->setCustomerIsGuest(0);
 
-            $orderModel->save();
+                $orderModel->save();
+            }
         }
 
         return $output;
