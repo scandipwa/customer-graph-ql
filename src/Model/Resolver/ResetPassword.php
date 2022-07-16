@@ -74,7 +74,8 @@ class ResetPassword implements ResolverInterface {
         $this->accountManagement = $accountManagement;
         $this->customerRepository = $customerRepository;
         $this->authentication = $authenctication;
-        $this->confirmByToken = $confirmByToken;
+        $this->confirmByToken = $confirmByToken
+            ?? ObjectManager::getInstance()->get(ConfirmCustomerByToken::class);
     }
 
     /**
