@@ -116,7 +116,7 @@ class ResetPassword implements ResolverInterface {
         try {
             // Check if the user has not yet confirmed the account
             // and if not do this along with changing the password
-            $this->confirmByToken->execute($resetPasswordToken);
+            $this->confirmByToken->resetCustomerConfirmation((int)$customerId);
 
             $this->accountManagement->resetPassword($customerEmail, $resetPasswordToken, $password);
             $this->authentication->unlock($customerId);
