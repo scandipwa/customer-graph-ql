@@ -87,6 +87,12 @@ class ResetPassword implements ResolverInterface {
             throw new GraphQlInputException(__('No customer found'));
         }
 
+        try {
+            $this->accountManagement->validateResetPasswordLinkToken((int)$customerId, $resetPasswordToken);
+        } catch (\Exception $exception) {
+            throw new GraphQlInputException(__($exception->getMessage()));
+        }
+
         if ($password !== $passwordConfirmation) {
             return [
                 'token' => $resetPasswordToken,
