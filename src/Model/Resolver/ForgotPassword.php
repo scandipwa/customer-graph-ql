@@ -22,6 +22,7 @@ use Magento\Customer\Model\Session;
 use Magento\Customer\Model\AccountManagement;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\SecurityViolationException;
+use Laminas\Validator\EmailAddress;
 
 class ForgotPassword implements ResolverInterface {
     const STATUS_INCORRECT_EMAIL = 'incorrect_email';
@@ -34,16 +35,23 @@ class ForgotPassword implements ResolverInterface {
     protected $customerAccountManagement;
 
     /**
+     * @var EmailAddress
+     */
+    protected $emailValidator;
+
+    /**
      * @var Session
      */
     protected $session;
 
     public function __construct(
         Session $customerSession,
-        AccountManagementInterface $customerAccountManagement
+        AccountManagementInterface $customerAccountManagement,
+        EmailAddress $emailValidator
     ) {
         $this->session = $customerSession;
         $this->customerAccountManagement = $customerAccountManagement;
+        $this->emailValidator = $emailValidator;
     }
 
     /**
@@ -61,10 +69,8 @@ class ForgotPassword implements ResolverInterface {
         /**
          * WE WILL ALWAYS RETURN SUCCESS FROM THIS FUNCTION, FOR SECURITY REASONS
          */
-
-        if (!\Zend_Validate::is($email, \Magento\Framework\Validator\EmailAddress::class)) {
+        if (!$this->emailValidator->isValid($email)) {
             $this->session->setForgottenEmail($email);
-            // return [ 'status' => self::STATUS_INCORRECT_EMAIL ];
             return [ 'status' => self::STATUS_PASSWORD_RESET_LINK_SENT ];
         }
 
@@ -76,12 +82,10 @@ class ForgotPassword implements ResolverInterface {
 
             return [ 'status' => self::STATUS_PASSWORD_RESET_LINK_SENT ];
         } catch (NoSuchEntityException $e) {
-            // return [ 'status' => self::STATUS_UNABLE_TO_SEND ];
             return [ 'status' => self::STATUS_PASSWORD_RESET_LINK_SENT ];
         } catch (SecurityViolationException $e) {
             throw new GraphQlInputException(__('Something went wrong'), $e);
         } catch (\Exception $e) {
-            // return [ 'status' => self::STATUS_UNABLE_TO_SEND ];
             return [ 'status' => self::STATUS_PASSWORD_RESET_LINK_SENT ];
         }
     }
