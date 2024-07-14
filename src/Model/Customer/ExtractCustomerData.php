@@ -17,9 +17,9 @@ use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Model\AccountConfirmation;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Webapi\ServiceOutputProcessor;
 use Magento\Store\Model\ScopeInterface;
+use Magento\EavGraphQl\Model\GetAttributeValueComposite;
 
 /**
  * Transform single customer data from object to in array format
@@ -29,31 +29,21 @@ class ExtractCustomerData extends \Magento\CustomerGraphQl\Model\Customer\Extrac
     /**
      * @var ScopeConfigInterface
      */
-    private $scopeConfig;
-
-    /**
-     * @var ServiceOutputProcessor
-     */
-    private $serviceOutputProcessor;
-
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
+    private ScopeConfigInterface $scopeConfig;
 
     /**
      * @param ServiceOutputProcessor $serviceOutputProcessor
      * @param ScopeConfigInterface $scopeConfig
-     * @param SerializerInterface $serializer
+     * @param GetAttributeValueComposite $getAttributeValueComposite
      */
     public function __construct(
         ServiceOutputProcessor $serviceOutputProcessor,
         ScopeConfigInterface $scopeConfig,
-        SerializerInterface $serializer
+        GetAttributeValueComposite $getAttributeValueComposite
     ) {
         parent::__construct(
             $serviceOutputProcessor,
-            $serializer
+            $getAttributeValueComposite
         );
         $this->scopeConfig = $scopeConfig;
     }
